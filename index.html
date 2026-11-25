@@ -1,508 +1,168 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>云游田畔庄园 · 小园丁种出来的城堡</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f1e8">
+<meta name="description" content="田畔庄园互动庭院，切换草坪婚礼与围炉煮茶。">
+<title>田畔庄园 · 口袋里的好时光</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
-  html { -webkit-text-size-adjust:100%; text-size-adjust:100%; overflow:hidden; }
-  body {
-    width:100vw; height:100vh; height:100dvh; overflow:hidden;
-    font-family:"PingFang SC","Microsoft YaHei",sans-serif;
-    cursor:pointer;
-  }
-  .stage { position:fixed; inset:0; overflow:hidden; transition:background 2s ease; }
-  .stage.day   { background:linear-gradient(#cfe8f5 0%,#e8f4ec 55%,#f6f0dc 100%); }
-  .stage.dusk  { background:linear-gradient(#8fa8c9 0%,#e8b98a 55%,#f2d9a7 100%); }
-  .stage.night { background:linear-gradient(#1d2a4a 0%,#33406b 55%,#4a4a6e 100%); }
+*{box-sizing:border-box}html{-webkit-tap-highlight-color:transparent}body{margin:0;background:#f3f1e8;color:#425641;font-family:"Microsoft YaHei","PingFang SC",sans-serif;transition:background 1.4s,color 1s}button{font:inherit;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}button:focus-visible,[role=button]:focus-visible{outline:2px solid #ba9255;outline-offset:5px}button:active{transform:scale(.92)}button:disabled{cursor:default}button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.shell{max-width:1640px;min-height:100svh;margin:auto;padding:30px 42px 12px;display:flex;flex-direction:column}.topbar{display:flex;justify-content:space-between;align-items:center;gap:25px;position:relative;z-index:3}.brand{display:flex;align-items:center;gap:13px;flex:none}.brand-icon{width:36px;height:42px;stroke:currentColor;fill:none;stroke-width:1.2}.brand-name{font:25px "Songti SC","SimSun",serif;letter-spacing:5px}.brand-en{font:9px Georgia,serif;letter-spacing:3px;margin-top:5px;opacity:.6}.toolbar{display:flex;gap:18px;align-items:center}.tool-group{display:flex;gap:4px;padding:4px;background:#e7eadf77;border:1px solid #d9dfce88;border-radius:100px}.icon-btn{width:43px;height:43px;border:0;border-radius:50%;background:transparent;color:#85907c;display:grid;place-items:center;transition:color .2s,background .2s,transform .15s}.icon-btn[aria-pressed=true]{background:#fffdf6;color:#475e43;box-shadow:0 2px 7px #4552370c}.icon-btn.action{color:#647759}.icon-btn.action[aria-pressed=true]{color:#b79555}.tool-group.events{background:#e2e8d9}.tool-group.events .icon-btn[aria-pressed=true]{background:#4c654a;color:#fff6dc}.stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;margin:-10px -25px -5px;min-height:0}.scene{width:100%;height:auto;max-height:calc(100svh - 110px);overflow:visible;isolation:isolate}.scene text{font-family:"Microsoft YaHei","PingFang SC",sans-serif}.scene .serif{font-family:"Songti SC","SimSun",serif}.window{cursor:pointer;outline:none;touch-action:manipulation}.pane{fill:#8da4a0;transition:fill .8s,filter .8s}.window.lit .pane,.glowing-window .pane{fill:#ffe0a0;filter:url(#warmGlow)}.mullion{stroke:#6b7164;stroke-width:2;fill:none;pointer-events:none}.frame{fill:#eee8d8;stroke:#c5b99c;stroke-width:1}.glass-shine{fill:#fff;opacity:.13;pointer-events:none}.window:focus-visible .frame{stroke:#f5be64;stroke-width:4}.night-wash{fill:#182b35;opacity:0;pointer-events:none;transition:opacity 1.4s;mix-blend-mode:multiply}.daylight{transition:opacity 1.4s,transform 1.4s;transform:translate(0,-12px)}.sky-stars,.halo{opacity:0;transition:opacity 1.4s}.sign-glow{opacity:0;transition:opacity 1.4s}.all-lit .sign-glow{opacity:1}#night-lights{opacity:0;transition:opacity 1s}.night #night-lights{opacity:1}.sign-night{opacity:0;transition:opacity 1s}.night.all-lit .sign-night{opacity:1}.night .night-wash{opacity:.53}.night .daylight{opacity:0}.night .sky-stars,.night .halo{opacity:1}.dusk .night-wash{fill:#eee4d5;opacity:.12}.dusk .daylight{transform:translate(28px,62px)}.dusk .sun-disc{fill:#e1a06c}.night{background:#182b35;color:#ece8d5}.night .tool-group{background:#273e42;border-color:#42554e}.night .icon-btn{color:#abbcaf}.night .icon-btn[aria-pressed=true]{background:#e6dcc3;color:#425641}.night .tool-group.events .icon-btn[aria-pressed=true]{background:#d3bb86;color:#293f38}.night .icon-btn.action{color:#c6bd94}.night .bird{opacity:0}.dusk{background:#eee4d5}.cloud{opacity:.6;animation:drift 16s ease-in-out infinite alternate}.cloud.two{animation-delay:-8s}.grass-sway{transform-box:fill-box;transform-origin:bottom center;animation:sway 5s ease-in-out infinite alternate}.bird{fill:none;stroke:#8b9b8b;stroke-width:2;opacity:.65;transition:opacity 1s}.pampas-hotspot{cursor:pointer;touch-action:manipulation}.shaking .grass-sway{animation:sway .3s ease-in-out 4 alternate}.floating-seed{fill:#f2e3bb;animation:seed 5s ease-in-out both;pointer-events:none}.event-scene{display:none}.event-scene.active{display:block}.build-piece{transform-box:fill-box;transform-origin:center bottom;animation:arrive .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--delay,0s)}.interactive-prop{cursor:pointer;touch-action:manipulation;outline:none}.interactive-prop:focus-visible{filter:drop-shadow(0 0 4px #f6d58e)}.petal{fill:#f3d8c9;animation:petalFall 3s ease-out both}.steam{fill:none;stroke:#efe7d3;stroke-width:3;stroke-linecap:round;opacity:.65;animation:steam 3.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center bottom}.steam.s2{animation-delay:-1.4s}.steam.s3{animation-delay:-2.3s}.tea .steam{opacity:.8}.flame{transform-box:fill-box;transform-origin:center bottom;animation:flicker 1.1s ease-in-out infinite alternate}.ember{fill:#ffc77b;animation:ember 2s ease-out infinite;transform-box:fill-box;transform-origin:center}.tea-glow{opacity:0;transition:opacity 1s}.night .tea-glow{opacity:.8}.tea-boiling .steam{stroke:#fff5dd;stroke-width:4;animation-duration:1.5s}.tea-boiling .kettle-body{filter:drop-shadow(0 0 5px #e6bc79)}.string-bulb{fill:#e9d5a1;transition:filter 1s,fill 1s}.night .string-bulb{fill:#ffe5a1;filter:url(#warmGlow)}.flag{transform-box:fill-box;transform-origin:top center;animation:sway 4s ease-in-out infinite alternate}.event-overlay{pointer-events:none}
+@keyframes arrive{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes sway{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}@keyframes drift{to{transform:translateX(24px)}}@keyframes seed{0%{transform:translate(0,0);opacity:0}20%{opacity:.7}100%{transform:translate(80px,-90px);opacity:0}}@keyframes steam{0%{transform:translateY(4px) scaleX(.9);opacity:0}35%{opacity:.65}100%{transform:translateY(-22px) scaleX(1.2);opacity:0}}@keyframes flicker{from{transform:scale(.9,1);opacity:.7}to{transform:scale(1.08,.85);opacity:1}}@keyframes ember{from{transform:translateY(0);opacity:.9}to{transform:translate(5px,-25px);opacity:0}}@keyframes petalFall{0%{transform:translate(0,-10px) rotate(0);opacity:0}10%{opacity:1}100%{transform:translate(45px,160px) rotate(130deg);opacity:0}}
+@media(hover:hover) and (pointer:fine){.icon-btn:hover{background:#fafbf277;color:#415b3c}.night .icon-btn:hover{background:#60716855;color:#f4e1b5}.tool-group.events .icon-btn:hover{background:#738669;color:white}.window:hover .frame{fill:#fff5d5}}
+@media(max-width:700px){.shell{padding:calc(18px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom));min-height:100svh}.topbar{flex-direction:column;gap:20px}.brand-name{font-size:23px}.brand-icon{width:32px;height:36px}.brand-en{font-size:8px;letter-spacing:2px}.toolbar{gap:10px}.tool-group{gap:2px;padding:3px}.icon-btn{width:36px;height:38px}.icon-btn svg{width:20px;height:20px}.stage{margin:0 -10px;min-height:360px}.scene{max-height:none;min-height:0}.brand{gap:10px}}
+@media(max-width:350px){.toolbar{gap:5px}.icon-btn{width:32px;height:36px}.tool-group{padding:2px;gap:1px}.icon-btn svg{width:18px;height:18px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.steam{opacity:.6}.petal{display:none}}
 
-  .sky-btns { position:fixed; top:18px; top:calc(18px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:50; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; width:max-content; max-width:96vw; }
-  .sky-btns button {
-    border:none; border-radius:999px; padding:8px 18px; font-size:14px; white-space:nowrap; flex:0 0 auto; line-height:1.25;
-    background:rgba(255,255,255,.75); color:#5a6b7a; cursor:pointer;
-    box-shadow:0 2px 8px rgba(0,0,0,.12); transition:all .3s; backdrop-filter:blur(4px);
-  }
-  .sky-btns button.on { background:#fff; color:#c96f4a; font-weight:600; transform:scale(1.08); }
-  .stage.night .sky-btns button { background:rgba(30,40,70,.7); color:#d8def0; }
-  .stage.night .sky-btns button.on { background:#f2d9a7; color:#4a3b28; }
-  .sky-btns button.tour-on { background:#c96f4a; color:#fff; }
+/* Layered atmosphere is deliberately separate from the interactive SVG. */
+body{isolation:isolate}.atmosphere{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}.atmosphere>div{position:absolute;inset:0;transition:opacity 2.4s ease-in-out}.sky-day{background:linear-gradient(180deg,#dce8e6 0%,#e8ede2 34%,#f2f0e4 69%,#efeedf 100%)}.sky-dusk{background:linear-gradient(180deg,#a6bac2 0%,#d8c8bc 32%,#f0d9b7 62%,#eae3cc 100%);opacity:0}.sky-night{background:radial-gradient(ellipse at 76% 24%,#3c5363 0%,#273d4a 32%,#182e37 75%);opacity:0}.sky-haze{background:radial-gradient(ellipse at 23% 55%,#ffffff44,transparent 57%);opacity:.7}.dusk .sky-dusk{opacity:1}.night .sky-night{opacity:1}.night .sky-haze{opacity:.05}.shell{position:relative}.night .night-wash,.dusk .night-wash{opacity:0}#grounds{transition:filter 1.8s ease-in-out}.night #grounds{filter:brightness(.58) saturate(.75)}.dusk #grounds{filter:sepia(.13) brightness(.96)}.scene{transform:translate3d(var(--world-x,0px),var(--world-y,0px),0);transition:transform .65s cubic-bezier(.2,.7,.3,1);will-change:transform}.distant-land{opacity:.65;transition:opacity 1.5s,transform 1s;transform:translate(calc(var(--world-x,0px)*-.6),calc(var(--world-y,0px)*-.4))}.night .distant-land{opacity:.23}.foreground{filter:blur(.6px);pointer-events:none;transform:translate(calc(var(--world-x,0px)*1.8),calc(var(--world-y,0px)*1.5));transition:transform .8s cubic-bezier(.2,.7,.3,1),opacity 1.5s;opacity:.72}.night .foreground{opacity:.38}.branch-sway{transform-box:fill-box;transform-origin:bottom left;animation:branchSway 8s ease-in-out infinite alternate}.foreground.right .branch-sway{transform-origin:bottom right;animation-delay:-4s}.night .sky-stars circle{animation:twinkle 4s ease-in-out infinite alternate}.icon-btn.demo{color:#6d825a}.icon-btn.demo[aria-pressed=true]{background:#4c654a;color:#fff6dc}.night .icon-btn.demo[aria-pressed=true]{background:#d3bb86;color:#293f38}.demo-pause{display:none}.demo-running .demo-play{display:none}.demo-running .demo-pause{display:block}.build-piece{animation-duration:.9s}.demo-running .build-piece{animation-duration:1.3s}.moon-rise{transform:translate(0,18px);transition:transform 2.2s ease-in-out}.night .moon-rise{transform:translate(0,0)}
+@keyframes branchSway{to{transform:rotate(1.6deg)}}@keyframes twinkle{from{opacity:.3}to{opacity:.85}}
+@media(max-width:700px){.toolbar{gap:7px}.icon-btn{width:33px;height:37px}.tool-group{padding:3px;gap:1px}.scene{width:100%;max-width:none}.foreground{opacity:.52}}
+@media(max-width:350px){.toolbar{gap:4px}.icon-btn{width:29px;height:35px}.tool-group{padding:2px;gap:0}.icon-btn svg{width:17px;height:17px}}
+@media(prefers-reduced-motion:reduce){.scene,.distant-land,.foreground{transform:none!important;will-change:auto}.night .sky-stars circle{animation:none}}
 
-  .scene { position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center; }
-  svg.castle-svg { width:min(92vw,900px); height:auto; display:block; }
-
-  .win { fill:#fff7e0; transition:fill 1.2s, filter 1.2s; }
-  .night .win { fill:#ffd884; filter:drop-shadow(0 0 6px rgba(255,200,100,.9)); }
-  .dusk  .win { fill:#ffe9b8; filter:drop-shadow(0 0 4px rgba(255,190,110,.6)); }
-  .glow { transition:opacity 1.2s; opacity:0; }
-  .night .glow { opacity:1; }
-
-  .sun, .moon { position:absolute; border-radius:50%; transition:all 2s ease; }
-  .sun { width:74px;height:74px; top:10%; right:14%; background:radial-gradient(#fff3c9,#ffd98a 60%,rgba(255,217,138,0)); }
-  .dusk .sun { top:26%; right:22%; width:64px;height:64px; background:radial-gradient(#ffe3ae,#ff9d6b 60%,rgba(255,157,107,0)); }
-  .night .sun { opacity:0; top:4%; }
-  .moon { width:56px;height:56px; top:9%; right:15%; background:radial-gradient(#fffbe8,#f4ead0 65%,rgba(244,234,208,.0)); opacity:0; }
-  .night .moon { opacity:1; }
-
-  .stars { position:absolute; inset:0; opacity:0; transition:opacity 2s; }
-  .night .stars { opacity:1; }
-  .star { position:absolute; width:3px;height:3px; background:#fff; border-radius:50%; animation:twinkle 3s infinite; }
-  @keyframes twinkle { 0%,100%{opacity:.3} 50%{opacity:1} }
-
-  .cloud { position:absolute; opacity:.85; animation:drift linear infinite; }
-  .night .cloud { opacity:.25; }
-  @keyframes drift { from{transform:translateX(-20vw)} to{transform:translateX(110vw)} }
-
-  .pampas { transform-origin:bottom center; animation:sway 4s ease-in-out infinite; }
-  @keyframes sway { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
-
-  #fx { position:fixed; inset:0; pointer-events:none; z-index:40; }
-
-  .title-card {
-    position:fixed; top:58px; left:50%; transform:translateX(-50%);
-    text-align:center; z-index:45; pointer-events:none; transition:color 2s;
-  }
-  .title-card .crest { width:52px; height:52px; margin:0 auto 6px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.18)); }
-  .title-card h1 { font-size:20px; letter-spacing:6px; font-weight:500; color:#6b7d8c; }
-  .title-card p { font-size:12px; letter-spacing:3px; color:#9aa8b3; margin-top:6px; }
-  .night .title-card h1 { color:#e8d9b8; }
-  .night .title-card p { color:#8f9ab5; }
-  .dusk .title-card h1 { color:#8a6a4f; }
-
-  /* 开场 logo 揭幕 */
-  .splash {
-    position:fixed; inset:0; z-index:90; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; gap:14px;
-    background:rgba(28,36,56,.92); transition:opacity 1.4s ease;
-  }
-  .splash .crest-big { width:120px; height:120px; animation:pop 1.2s cubic-bezier(.2,1.6,.4,1); }
-  .splash h1 { color:#f2e4c2; font-size:26px; letter-spacing:10px; font-weight:500; animation:fadeUp 1.4s; }
-  .splash p { color:#a8b2c9; font-size:13px; letter-spacing:4px; animation:fadeUp 1.6s; }
-  .splash p.tap-hint { color:#d3daea; font-size:12.5px; letter-spacing:2.5px; margin-top:-4px; animation:fadeUp 1.6s .5s both; }
-  @keyframes pop { 0%{transform:scale(.2);opacity:0} 70%{transform:scale(1.12)} 100%{transform:scale(1);opacity:1} }
-  @keyframes fadeUp { 0%{transform:translateY(14px);opacity:0} 100%{transform:translateY(0);opacity:1} }
-
-  /* 热气球 */
-  .balloon { position:fixed; z-index:30; pointer-events:none; }
-  .balloon svg { animation:bob 3s ease-in-out infinite; }
-  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-
-  /* 手机竖屏适配 */
-  @media (max-width: 640px) {
-    .sky-btns { top:10px; top:calc(10px + env(safe-area-inset-top)); gap:6px; }
-    .sky-btns button { padding:6px 11px; font-size:12.5px; }
-    .title-card { top:100px; }
-    .title-card .crest { width:40px; height:40px; }
-    .title-card h1 { font-size:17px; letter-spacing:4px; }
-    .title-card p { font-size:10.5px; letter-spacing:2px; }
-    .scene { display:block; }
-    svg.castle-svg {
-      position:absolute; bottom:1.5vh; left:50%; transform:translateX(-50%);
-      width:168vw; max-width:none;
-    }
-    .sun { width:52px; height:52px; top:21%; right:7%; }
-    .dusk .sun { width:46px; height:46px; top:32%; right:12%; }
-    .moon { width:42px; height:42px; top:20%; right:8%; }
-    .splash .crest-big { width:92px; height:92px; }
-    .splash h1 { font-size:20px; letter-spacing:6px; }
-    .splash p { font-size:11px; letter-spacing:3px; }
-    .splash p.tap-hint { font-size:11px; letter-spacing:2px; }
-  }
-
-  /* 徽章配色 */
-  .c-shield { fill:#f4ead0; stroke:#b98d5f; stroke-width:6; }
-  .c-castle { fill:#c96f4a; }
-  .c-field  { fill:#a8c98a; }
-  .c-wheat  { fill:#d8b45f; }
-  .c-text   { fill:#8a5a3a; font-family:serif; }
+/* A continuous lawn replaces the floating display plinth. */
+.shell{max-width:none;padding-bottom:0}.stage{margin-bottom:0}.scene{overflow:hidden}.foreground{display:none}
+@media(max-width:700px){.stage{margin-left:-12px;margin-right:-12px}.shell{padding-bottom:0}}
 </style>
 </head>
-<body>
-<div class="stage day" id="stage">
-  <div class="sun"></div>
-  <div class="moon"></div>
-  <div class="stars" id="stars"></div>
+<body data-version="6">
+<div class="atmosphere" aria-hidden="true"><div class="sky-day"></div><div class="sky-dusk"></div><div class="sky-night"></div><div class="sky-haze"></div></div>
+<main class="shell">
+<header class="topbar"><div class="brand"><svg class="brand-icon" viewBox="0 0 44 48" aria-hidden="true"><path d="M5 42V23L14 14V42M14 42V13L22 5L30 13V42M30 42V14L39 23V42M2 43H42M19 42V32Q22 27 25 32V42M19 25V20Q22 15 25 20V25M8 27H11M33 27H36M10 13V7M34 13V7"/><path d="M4 46Q22 40 40 46"/></svg><div><div class="brand-name">田畔庄园</div><div class="brand-en">TIANPAN MANOR · CHENGDU</div></div></div><nav class="toolbar" aria-label="庄园互动"><div class="tool-group" role="group" aria-label="选择时段"><button class="icon-btn " data-mode="day" aria-label="白天" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2V4M12 20V22M2 12H4M20 12H22M5 5L6.5 6.5M17.5 17.5L19 19M5 19L6.5 17.5M17.5 6.5L19 5"/></svg></button><button class="icon-btn " data-mode="dusk" aria-label="黄昏" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16H21M5 20H19M7 16A5 5 0 0 1 17 16M12 3V6M3 8L5 10M21 8L19 10"/></svg></button><button class="icon-btn " data-mode="night" aria-label="夜晚" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 15A8 8 0 0 1 9 5A8 8 0 1 0 19 15Z"/></svg></button></div><div class="tool-group events" role="group" aria-label="选择草坪场景"><button class="icon-btn " data-event="wedding" aria-label="草坪婚礼" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V10A7 7 0 0 1 19 10V21M3 21H7M17 21H21M4 12H6M18 12H20M7 5L9 7M15 7L17 5"/><path d="M10 13L12 11L14 13L12 16Z"/></svg></button><button class="icon-btn " data-event="tea" aria-label="围炉煮茶" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10H18L17 20H7ZM7 10Q6 3 12 3Q18 3 17 10M18 12H20Q24 12 20 17H17M5 12L2 9L2 15L7 18M10 7H14M12 5V7"/></svg></button></div><div class="tool-group"><button class="icon-btn action" id="light-all" aria-label="为庄园亮灯" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18H15M10 21H14M9 15C9 12 5 12 5 7A7 7 0 0 1 19 7C19 12 15 12 15 15Z"/></svg></button><button class="icon-btn demo" id="demo" aria-label="自动演示" aria-pressed="false"><svg class="demo-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5L19 12L9 19Z"/><path d="M4 5V19"/></svg><svg class="demo-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5V19M16 5V19" stroke-width="3"/></svg></button><button class="icon-btn action" id="reset" aria-label="重新开始"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10A9 9 0 1 1 5 18M3 4V10H9"/></svg></button></div></nav></header>
 
-  <!-- 田畔庄园 徽章模板 -->
-  <svg style="position:absolute;width:0;height:0">
-    <defs>
-      <g id="crestShape">
-        <path class="c-shield" d="M50 4 C70 12 88 14 94 14 C94 58 84 84 50 96 C16 84 6 58 6 14 C12 14 30 12 50 4 Z"/>
-        <path class="c-field" d="M14 62 Q32 54 50 60 Q68 66 86 60 L84 72 Q68 80 50 74 Q32 68 17 74 Z"/>
-        <g class="c-castle">
-          <rect x="30" y="40" width="12" height="20"/>
-          <rect x="58" y="40" width="12" height="20"/>
-          <rect x="41" y="30" width="18" height="30"/>
-          <polygon points="38,30 50,20 62,30"/>
-          <rect x="34" y="26" width="3" height="10"/>
-          <rect x="63" y="26" width="3" height="10"/>
-        </g>
-        <g class="c-wheat">
-          <path d="M24 70 Q22 58 24 50" stroke="#d8b45f" stroke-width="2" fill="none"/>
-          <path d="M76 70 Q78 58 76 50" stroke="#d8b45f" stroke-width="2" fill="none"/>
-        </g>
-        <text class="c-text" x="50" y="90" text-anchor="middle" font-size="10" letter-spacing="1">田畔庄园</text>
-      </g>
-    </defs>
-  </svg>
+<div class="stage"><svg class="scene" id="scene" viewBox="50 150 1300 870" role="group" aria-label="田畔庄园互动庭院">
+<defs>
+<linearGradient id="lawn" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b1bd89"/><stop offset=".55" stop-color="#9fad79"/><stop offset="1" stop-color="#bbc499"/></linearGradient>
+<linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d7bc91"/><stop offset="1" stop-color="#bc9c72"/></linearGradient>
+<linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#65716b"/><stop offset="1" stop-color="#414e4b"/></linearGradient>
+<linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b6aa8d"/><stop offset="1" stop-color="#918c73"/></linearGradient>
+<linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8caaa6"/><stop offset="1" stop-color="#5c7c78"/></linearGradient>
+<radialGradient id="sunlight"><stop stop-color="#f9e8b2" stop-opacity=".7"/><stop offset="1" stop-color="#f9e8b2" stop-opacity="0"/></radialGradient>
+<radialGradient id="moonlight"><stop stop-color="#e4dfb6" stop-opacity=".2"/><stop offset="1" stop-color="#e4dfb6" stop-opacity="0"/></radialGradient>
+<radialGradient id="signlight"><stop stop-color="#ffdb8c" stop-opacity=".7"/><stop offset="1" stop-color="#ffdb8c" stop-opacity="0"/></radialGradient>
+<pattern id="bricks" width="25" height="12" patternUnits="userSpaceOnUse"><path d="M0 0H25M0 12H25M12.5 0V6M0 6H25M0 6V12M25 6V12" stroke="#a9916b" stroke-width=".6" opacity=".44"/></pattern>
+<pattern id="tiles" width="16" height="12" patternUnits="userSpaceOnUse"><path d="M0 0H16M0 12H16M8 0V6M0 6H16M0 6V12M16 6V12" stroke="#b0b5a1" stroke-width=".65" opacity=".28"/></pattern>
+<pattern id="pebbles" width="45" height="36" patternUnits="userSpaceOnUse"><path d="M2 3Q9-2 15 4L16 12Q8 17 1 11ZM20 1L32 0 36 8 27 14 19 9ZM4 23L13 18 22 23 19 34 8 35 2 30ZM29 18L40 16 46 24 40 33 29 31 25 24" fill="#c5b799" stroke="#8d8c77" stroke-width="1.1"/><path d="M1 15L7 17 2 21M37 2L44 5 41 12M20 14L24 16 19 18" stroke="#d6c8aa" fill="none"/></pattern>
+<pattern id="court-stone" width="146" height="82" patternUnits="userSpaceOnUse"><path d="M0 1H146M0 81H146M49 1L45 42H0M45 42L103 40 109 82M103 40L105 1M103 40H146" fill="none" stroke="#b9bbae" stroke-width="1" opacity=".45"/><path d="M1 2H48L44 41H1Z" fill="#e5e3d6" opacity=".14"/></pattern><pattern id="pavers" width="50" height="25" patternUnits="userSpaceOnUse"><rect width="50" height="25" fill="#c9bfa6"/><path d="M0 0H50M0 25H50M25 0V12.5M0 12.5H50M0 12.5V25M50 12.5V25" stroke="#e5dbc6" stroke-width="2"/></pattern>
+<filter id="warmGlow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="softShadow" x="-20%" y="-30%" width="150%" height="180%"><feGaussianBlur stdDeviation="12"/></filter>
+<g id="tree"><path d="M0 0Q-4-35-1-85" stroke="#777c53" stroke-width="6" fill="none"/><path d="M0-35L-20-68M0-50L21-82" stroke="#777c53" stroke-width="3"/><ellipse cx="0" cy="-89" rx="29" ry="51" fill="#697f57"/><ellipse cx="-19" cy="-69" rx="27" ry="39" fill="#819362"/><ellipse cx="19" cy="-84" rx="23" ry="37" fill="#91a36f"/><ellipse cx="-8" cy="-112" rx="21" ry="28" fill="#96a777"/><path d="M-12-113Q4-120 16-100M-30-76Q-20-90-7-85" fill="none" stroke="#b0bd8b" stroke-width="4" stroke-linecap="round" opacity=".5"/></g>
+<g id="shrub"><ellipse cy="5" rx="30" ry="8" fill="#5b714a" opacity=".15"/><ellipse cx="-16" cy="-7" rx="18" ry="19" fill="#73885b"/><ellipse cx="13" cy="-11" rx="22" ry="22" fill="#879b65"/><ellipse cx="-2" cy="-22" rx="20" ry="20" fill="#94a573"/><path d="M-20-10L-17-14M8-24L14-26M-4-34L1-35" stroke="#bdc69b" stroke-width="2" stroke-linecap="round"/></g>
+<g id="pampas"><path d="M0 5Q-10-55-28-80M0 5Q0-70 8-108M0 5Q20-47 38-68M0 5Q-4-45-12-112M0 5Q13-66 23-94" stroke="#9c9b6c" stroke-width="2" fill="none"/><g fill="#dfd3b3"><ellipse cx="-28" cy="-83" rx="6" ry="24" transform="rotate(-22 -28 -83)"/><ellipse cx="8" cy="-110" rx="6" ry="27" transform="rotate(8 8 -110)"/><ellipse cx="38" cy="-72" rx="6" ry="22" transform="rotate(32 38 -72)"/><ellipse cx="-12" cy="-113" rx="6" ry="25" transform="rotate(-5 -12 -113)"/><ellipse cx="23" cy="-98" rx="6" ry="24" transform="rotate(19 23 -98)"/></g><g stroke="#a4a575" stroke-width="2" fill="none"><path d="M0 5Q-35-29-48-25M0 5Q32-30 53-20M0 5Q-20-40-27-42M0 5Q15-37 30-38"/></g></g>
+<g id="flower"><path d="M0 3V16M0 12Q-8 6-8 10M0 14Q8 8 8 11" stroke="#6d8c50" stroke-width="2" fill="none"/><g fill="#f3e4b2"><circle cy="-5" r="4"/><circle cx="5" cy="-1" r="4"/><circle cx="3" cy="5" r="4"/><circle cx="-3" cy="5" r="4"/><circle cx="-5" cy="-1" r="4"/></g><circle r="3" fill="#bca059"/></g>
+</defs>
+<g id="distant-land" class="distant-land" aria-hidden="true"></g><g class="daylight" aria-hidden="true"><ellipse cx="1070" cy="265" rx="190" ry="150" fill="url(#sunlight)"/><circle cx="1065" cy="240" r="49" class="sun-disc" fill="#e8d8a6" opacity=".8"/></g>
+<g class="halo" transform="translate(-535 -110) scale(1.5)"><g class="moon-rise"><ellipse cx="1090" cy="245" rx="145" ry="130" fill="url(#moonlight)"/><path d="M1103 203A24 24 0 1 0 1123 239A24 24 0 0 1 1103 203" fill="#e9dfb4" opacity=".8"/></g>
+</g><g class="sky-stars" id="stars"></g><g class="cloud" fill="#fff" opacity=".5"><ellipse cx="294" cy="256" rx="55" ry="10"/><ellipse cx="323" cy="248" rx="29" ry="14"/></g><g class="cloud two" fill="#fff" opacity=".4"><ellipse cx="1100" cy="340" rx="71" ry="9"/><ellipse cx="1075" cy="331" rx="34" ry="15"/></g>
+<g class="bird"><path d="M373 280q10-12 20 0q10-12 20 0M421 262q7-8 14 0q7-8 14 0M1000 290q7-8 14 0q7-8 14 0"/></g>
+<g id="grounds">
 
-  <div class="title-card">
-    <svg class="crest" viewBox="0 0 100 100"><use href="#crestShape"/></svg>
-    <h1>云游田畔庄园</h1>
-    <p>小园丁种出来的城堡 · 成都新津</p>
-  </div>
+<path id="continuous-lawn" d="M-400 760L142 606L590 447Q699 417 815 449L1263 611L1800 760V1600H-400Z" fill="url(#lawn)"/>
 
-  <div class="sky-btns">
-    <button data-mode="day" class="on">☀️ 白天</button>
-    <button data-mode="dusk">🌇 黄昏</button>
-    <button data-mode="night">🌙 夜晚</button>
-    <button id="tourBtn">🎬 自动巡游</button>
-  </div>
+<path id="forecourt" d="M181 708L470 604H930L1215 711L1078 730Q700 775 321 731Z" fill="#cfcebf"/>
+<path d="M181 708L470 604H930L1215 711L1078 730Q700 775 321 731Z" fill="url(#court-stone)" opacity=".55"/>
+<path id="garden-path-edge" d="M681 775H719L752 1600H648Z" fill="#ded8c5"/>
+<path id="garden-path" d="M687 775H713L741 1600H659Z" fill="url(#pavers)"/>
+<g id="courtyard-steps" transform="translate(0 -39)"><path d="M647 783H753L765 799H635Z" fill="#a9aa96"/><path d="M635 799H765V805H635Z" fill="#c5c3ad"/><path d="M640 798H760L769 813H631Z" fill="#ded8c4"/><path d="M631 813H769V819H631Z" fill="#b1b39b"/></g>
 
-  <div class="scene">
-    <svg class="castle-svg" viewBox="0 0 900 560">
-      <!-- 草坪 -->
-      <ellipse cx="450" cy="548" rx="460" ry="46" fill="#a8c98a"/>
-      <ellipse cx="450" cy="560" rx="480" ry="40" fill="#96bd7c"/>
-      <path d="M380 560 Q450 520 520 560 Z" fill="#e9dfc4"/>
+<g id="rear-trees" transform="translate(42 -15) scale(.94)"></g><g id="architecture" transform="translate(42 -15) scale(.94)"></g><g id="planting" transform="translate(42 -15) scale(.94)"></g>
 
-      <!-- 主楼 -->
-      <g id="castle" onclick="castleTap()" style="cursor:pointer">
-        <rect x="150" y="330" width="180" height="190" fill="#e4c39a"/>
-        <rect x="150" y="330" width="180" height="190" fill="none" stroke="#c9a271" stroke-width="3"/>
-        <polygon points="150,330 240,272 330,330" fill="#9aa7b5"/>
-        <rect x="186" y="370" width="24" height="38" rx="12" class="win"/>
-        <rect x="238" y="370" width="24" height="38" rx="12" class="win"/>
-        <rect x="290" y="370" width="24" height="38" rx="12" class="win"/>
-        <rect x="186" y="440" width="24" height="38" rx="12" class="win"/>
-        <rect x="290" y="440" width="24" height="38" rx="12" class="win"/>
-        <rect x="222" y="452" width="40" height="68" rx="20" fill="#8a6a4f"/>
-        <rect x="172" y="292" width="16" height="42" fill="#b98d5f"/>
-        <!-- 中央主塔（尖山墙） -->
-        <rect x="330" y="240" width="240" height="280" fill="#e9c9a0"/>
-        <rect x="330" y="240" width="240" height="280" fill="none" stroke="#c9a271" stroke-width="3"/>
-        <polygon points="330,240 450,150 570,240" fill="#8f9cad"/>
-        <polygon points="330,240 450,150 570,240" fill="none" stroke="#7a8ba0" stroke-width="3"/>
-        <rect x="436" y="196" width="28" height="58" rx="14" class="win"/>
-        <rect x="366" y="300" width="26" height="44" rx="13" class="win"/>
-        <rect x="437" y="300" width="26" height="44" rx="13" class="win"/>
-        <rect x="508" y="300" width="26" height="44" rx="13" class="win"/>
-        <rect x="366" y="386" width="26" height="44" rx="13" class="win"/>
-        <rect x="508" y="386" width="26" height="44" rx="13" class="win"/>
-        <rect x="424" y="430" width="52" height="90" rx="26" fill="#8a6a4f"/>
-        <g transform="translate(382,268)">
-          <rect x="0" y="10" width="26" height="26" fill="#f0dcc0"/>
-          <polygon points="0,10 13,0 26,10" fill="#9aa7b5"/>
-        </g>
-        <g transform="translate(492,268)">
-          <rect x="0" y="10" width="26" height="26" fill="#f0dcc0"/>
-          <polygon points="0,10 13,0 26,10" fill="#9aa7b5"/>
-        </g>
-        <rect x="352" y="188" width="16" height="52" fill="#b98d5f"/>
-        <rect x="532" y="188" width="16" height="52" fill="#b98d5f"/>
-        <!-- 右翼 -->
-        <rect x="570" y="330" width="180" height="190" fill="#e4c39a"/>
-        <rect x="570" y="330" width="180" height="190" fill="none" stroke="#c9a271" stroke-width="3"/>
-        <polygon points="570,330 660,272 750,330" fill="#9aa7b5"/>
-        <rect x="596" y="370" width="24" height="38" rx="12" class="win"/>
-        <rect x="648" y="370" width="24" height="38" rx="12" class="win"/>
-        <rect x="700" y="370" width="24" height="38" rx="12" class="win"/>
-        <rect x="596" y="440" width="24" height="38" rx="12" class="win"/>
-        <rect x="700" y="440" width="24" height="38" rx="12" class="win"/>
-        <rect x="638" y="452" width="40" height="68" rx="20" fill="#8a6a4f"/>
-        <rect x="712" y="292" width="16" height="42" fill="#b98d5f"/>
-        <g class="glow">
-          <circle cx="240" cy="330" r="4" fill="#ffd884"/><circle cx="280" cy="318" r="4" fill="#ffd884"/>
-          <circle cx="320" cy="330" r="4" fill="#ffd884"/><circle cx="580" cy="330" r="4" fill="#ffd884"/>
-          <circle cx="620" cy="318" r="4" fill="#ffd884"/><circle cx="660" cy="330" r="4" fill="#ffd884"/>
-          <circle cx="450" cy="152" r="5" fill="#ffe9b0"/>
-        </g>
-      </g>
+<g class="pampas-hotspot" id="pampas-patch" role="button" tabindex="0" aria-label="轻碰蒲苇，让风吹过庄园"><ellipse cx="987" cy="763" rx="88" ry="27" fill="#849265" opacity=".2"/><g class="grass-sway"><use href="#pampas" transform="translate(954 769) scale(.8)"/><use href="#pampas" transform="translate(996 780)"/><use href="#pampas" transform="translate(1041 760) scale(.72)"/></g><rect x="923" y="647" width="147" height="148" fill="transparent"/></g>
+<g id="wedding-scene" transform="translate(0 90) scale(1 .94)" class="event-scene"></g><g id="tea-scene" transform="translate(-120 -140) scale(1.25)" class="event-scene"></g><g id="manor-sign" transform="translate(160 125)" aria-label="田畔庄园"><ellipse class="sign-glow" cx="904" cy="835" rx="140" ry="56" fill="url(#signlight)"/><path d="M802 835L1000 786 1024 806 826 858Z" fill="#7b8a61" opacity=".25"/><path d="M809 798L1005 753V800L809 845Z" fill="#b9bea2"/><path d="M809 798L815 795 1011 750 1005 753Z" fill="#ebebd9"/><path d="M1005 753L1011 750V797L1005 800Z" fill="#8a967b"/><g transform="matrix(1,-.23,0,1,818,795)"><text x="4" y="32" class="serif" font-size="31" font-weight="bold" letter-spacing="6" fill="#f8f6e9">田畔庄园</text><text x="8" y="44" font-size="7" letter-spacing="2.6" fill="#edf0dc">TIANPAN MANOR</text></g><path d="M821 841V859M989 802V821" stroke="#788469" stroke-width="3"/></g>
+<g id="front-flowers"></g>
 
-      <!-- 入口门牌（画在城堡之后，位于前景） -->
-      <g id="gate" transform="translate(450,512)">
-        <rect x="-46" y="0" width="10" height="46" rx="3" fill="#c9a271"/>
-        <rect x="36" y="0" width="10" height="46" rx="3" fill="#c9a271"/>
-        <path d="M-52 4 Q0 -26 52 4" fill="none" stroke="#b98d5f" stroke-width="6"/>
-        <rect x="-34" y="6" width="68" height="20" rx="4" fill="#f4ead0" stroke="#b98d5f" stroke-width="2.5"/>
-        <text x="0" y="20.5" text-anchor="middle" font-size="13" fill="#8a5a3a" style="font-family:serif;letter-spacing:2px">田畔庄园</text>
-        <circle cx="-34" cy="-2" r="2.5" class="win"/>
-        <circle cx="34" cy="-2" r="2.5" class="win"/>
-      </g>
+</g><path class="night-wash" d="M-20 100H1420V1140H-20Z"/><g id="night-lights" style="pointer-events:none" aria-hidden="true"></g><g class="sign-night" transform="translate(160 125)" style="pointer-events:none" aria-hidden="true"><ellipse cx="905" cy="813" rx="125" ry="54" fill="url(#signlight)"/><g transform="matrix(1,-.23,0,1,818,795)"><text x="4" y="32" class="serif" font-size="31" font-weight="bold" letter-spacing="6" fill="#ffe5ad">田畔庄园</text></g></g><g id="floating-seeds" aria-hidden="true"></g><g id="petals" transform="translate(0 90) scale(1 .94)" class="event-overlay" aria-hidden="true"></g><g id="tea-night" transform="translate(-120 -140) scale(1.25)" class="event-overlay" aria-hidden="true"></g>
+</svg></div>
 
-      <!-- 蒲苇 -->
-      <g class="pampas" onclick="fxTap('pampas')" style="cursor:pointer">
-        <g transform="translate(96,470)">
-          <path d="M0 60 Q-4 20 -10 0" stroke="#c9b98a" stroke-width="3" fill="none"/>
-          <path d="M10 60 Q14 24 20 4" stroke="#c9b98a" stroke-width="3" fill="none"/>
-          <ellipse cx="-12" cy="-4" rx="9" ry="22" fill="#e8dcc0" transform="rotate(-14)"/>
-          <ellipse cx="21" cy="0" rx="9" ry="24" fill="#e2d4b4" transform="rotate(12)"/>
-        </g>
-        <g transform="translate(806,466)">
-          <path d="M0 60 Q-4 20 -10 0" stroke="#c9b98a" stroke-width="3" fill="none"/>
-          <path d="M12 60 Q16 26 24 6" stroke="#c9b98a" stroke-width="3" fill="none"/>
-          <ellipse cx="-12" cy="-2" rx="9" ry="22" fill="#e8dcc0" transform="rotate(-12)"/>
-          <ellipse cx="26" cy="2" rx="9" ry="24" fill="#e2d4b4" transform="rotate(14)"/>
-        </g>
-        <g transform="translate(770,486)">
-          <path d="M0 52 Q-2 18 -6 2" stroke="#c9b98a" stroke-width="2.5" fill="none"/>
-          <ellipse cx="-7" cy="-2" rx="8" ry="18" fill="#e5d8ba" transform="rotate(-10)"/>
-        </g>
-      </g>
-
-      <!-- 小树 -->
-      <g onclick="fxTap('tree')" style="cursor:pointer">
-        <g transform="translate(120,486)">
-          <rect x="-4" y="18" width="8" height="26" fill="#9a7b58"/>
-          <circle cx="0" cy="0" r="26" fill="#a9cc90"/>
-          <circle cx="-14" cy="10" r="16" fill="#b7d69e"/>
-          <circle cx="14" cy="8" r="17" fill="#9fc487"/>
-        </g>
-        <g transform="translate(790,500)">
-          <rect x="-4" y="14" width="8" height="22" fill="#9a7b58"/>
-          <circle cx="0" cy="0" r="22" fill="#a9cc90"/>
-          <circle cx="12" cy="8" r="14" fill="#b7d69e"/>
-        </g>
-      </g>
-    </svg>
-  </div>
-
-  <canvas id="fx"></canvas>
-</div>
-
-<!-- 开场徽章揭幕 -->
-<div class="splash" id="splash">
-  <svg class="crest-big" viewBox="0 0 100 100"><use href="#crestShape"/></svg>
-  <h1>田畔庄园</h1>
-  <p>TIANPAN MANOR · 成都新津</p>
-  <p class="tap-hint">这座城堡可以点一点 · 天空、城堡、草地都有惊喜</p>
-</div>
-
+</main>
 <script>
-const stage = document.getElementById('stage');
-const canvas = document.getElementById('fx');
-const ctx = canvas.getContext('2d');
-let W, H;
-function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-resize(); addEventListener('resize', resize);
+'use strict';
+const NS='http://www.w3.org/2000/svg',architecture=document.getElementById('architecture'),scene=document.getElementById('scene'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let seed=37;
+function random(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
+function el(tag,attrs={},parent){const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(parent)parent.appendChild(n);return n;}
+function rect(x,y,w,h,fill,parent,extra={}){return el('rect',{x,y,width:w,height:h,fill,...extra},parent);}
+function path(d,fill,parent,extra={}){return el('path',{d,fill,...extra},parent);}
+function use(id,x,y,scale,parent){return el('use',{href:'#'+id,transform:`translate(${x} ${y}) scale(${scale})`},parent);}
+function wall(w,h,g){rect(0,0,w,h,'url(#wall)',g);rect(0,0,w,h,'url(#bricks)',g);rect(0,h*.47,w,h*.53,'url(#stone)',g);rect(0,h*.47,w,h*.53,'url(#pebbles)',g,{opacity:.72});path(`M0 0H${w}M0 ${h*.47}H${w}`,'none',g,{stroke:'#8d876b','stroke-width':3});}
+function roof(w,g,depth=100){const d=`M-12 0L28 ${-depth}H${w-22}L${w+12} 0Z`;path(d,'url(#roof)',g,{stroke:'#56615b','stroke-width':2});path(d,'url(#tiles)',g);path(`M-13 0H${w+13}`,'none',g,{stroke:'#d4b98c','stroke-width':7});path(`M29 ${-depth}H${w-23}`,'none',g,{stroke:'#8b9280','stroke-width':3});}
+const windows=[];
+function win(x,y,w,h,g,arch=true){const group=el('g',{class:'window',role:'button',tabindex:0,'aria-label':'点亮一扇庄园窗户','aria-pressed':'false'},g),r=w/2;const d=arch?`M${x} ${y+h}V${y+r}A${r} ${r} 0 0 1 ${x+w} ${y+r}V${y+h}Z`:`M${x} ${y}H${x+w}V${y+h}H${x}Z`;path(d,'#eee8d8',group,{class:'frame'});const p=4,inner=arch?`M${x+p} ${y+h-p}V${y+r}A${r-p} ${r-p} 0 0 1 ${x+w-p} ${y+r}V${y+h-p}Z`:`M${x+p} ${y+p}H${x+w-p}V${y+h-p}H${x+p}Z`;path(inner,'#8da4a0',group,{class:'pane'});path(`M${x+r} ${y+5}V${y+h-3}M${x+4} ${y+h*.46}H${x+w-4}M${x+4} ${y+h*.72}H${x+w-4}`,'none',group,{class:'mullion'});path(`M${x+8} ${y+h*.43}L${x+w*.38} ${y+9}H${x+w*.55}L${x+w*.25} ${y+h*.43}Z`,'#fff',group,{class:'glass-shine'});if(arch)rect(x+r-3,y-2,6,10,'#f0ecdf',group);group.addEventListener('click',()=>toggleWindow(group));group.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleWindow(group);}});windows.push(group);return group;}
+function chimney(x,y,g){const c=el('g',{class:'chimney'},g);rect(x,y-43,24,43,'#a7a392',c,{stroke:'#8d9185','stroke-width':1});rect(x+2,y-41,5,39,'#c0bbaa',c,{opacity:.45});path(`M${x} ${y-30}h24M${x} ${y-16}h24`,'none',c,{stroke:'#929485','stroke-width':.8,opacity:.5});path(`M${x-4} ${y-43}l4-5h24l4 5v5h-32Z`,'#d3d3c3',c);path(`M${x+3} ${y-48}l4-10h10l4 10Z`,'#bfc3b6',c);}
+function dormer(x,g){path(`M${x-6} -8V-44L${x+17} -61L${x+40} -44V-8Z`,'#ccb28b',g);path(`M${x-11} -43L${x+17} -66L${x+45} -43Z`,'#59655f',g,{stroke:'#92957f','stroke-width':2});win(x,-39,34,29,g,false);}
+function gable(x,w,g,h=116){const d=`M${x} 2L${x+w/2} ${-h}L${x+w} 2V190H${x}Z`;path(d,'url(#stone)',g);path(d,'url(#pebbles)',g,{opacity:.65});path(`M${x-5} 5L${x+w/2} ${-h-7}L${x+w+5} 5`,'none',g,{stroke:'#d8bc87','stroke-width':8,'stroke-linejoin':'round'});path(`M${x+9} 4L${x+w/2} ${-h+15}L${x+w-9} 4V87L${x+w/2} 98L${x+9} 87Z`,'#735f4c',g);win(x+17,-9,w-34,100,g,false);path(`M${x+17} -12L${x+w/2} ${-h+29}L${x+w-17} -12Z`,'url(#glass)',g,{stroke:'#69766b','stroke-width':3});path(`M${x+w/2} ${-h+33}V-10`,'none',g,{stroke:'#b0ad8c','stroke-width':2});path(`M${x+8} 89L${x+w/2} 103L${x+w-8} 89V109L${x+w/2} 121L${x+8} 109Z`,'#a58b62',g);win(x+12,125,w-24,85,g,true);}
+// The projecting wings and courtyard follow the supplied photographs.
+const back=el('g',{transform:'translate(454 421)'},architecture);wall(492,236,back);roof(492,back,119);[47,162,303,414].forEach(x=>dormer(x,back));[100,390].forEach(x=>chimney(x,-91,back));[30,117,326,414].forEach(x=>win(x,41,48,48,back,false));[25,112,330,416].forEach(x=>win(x,134,55,99,back));gable(204,86,back,119);const entranceSteps=el('g',{id:'entrance-steps'},back);for(let i=0;i<3;i++){const x=212-i*7,y=213+i*8,w=78+i*14;path(`M${x+4} ${y}H${x+w-4}L${x+w} ${y+6}H${x}Z`,'#ddd9c9',entranceSteps,{stroke:'#b0b1a0','stroke-width':.6});rect(x,y+6,w,3,'#aeb09e',entranceSteps);}
+const left=el('g',{transform:'matrix(.82 -.29 0 1 105 566)'},architecture);wall(425,215,left);roof(425,left,102);[33,125,235,335].forEach(x=>dormer(x,left));[225].forEach(x=>chimney(x,-80,left));[27,112,197,282,365].forEach(x=>{win(x,30,38,42,left,false);win(x-5,113,53,99,left);});
+const leftEnd=el('g',{transform:'matrix(.72 .25 0 1 19 536)'},architecture);wall(119,215,leftEnd);path('M-7 0L59 -134L126 0Z','url(#wall)',leftEnd);path('M-7 0L59 -134L126 0Z','url(#bricks)',leftEnd);path('M-10 3L59 -140L130 3','none',leftEnd,{stroke:'#c4a875','stroke-width':7});win(48,-61,22,90,leftEnd,false);win(12,120,44,91,leftEnd);win(64,120,44,91,leftEnd);
+const right=el('g',{transform:'matrix(.82 .29 0 1 946 443)'},architecture);wall(425,215,right);roof(425,right,115);[125,259,390].forEach(x=>dormer(x,right));[270].forEach(x=>chimney(x,-93,right));[32,165,300].forEach(x=>gable(x,84,right,99));
+const rightEnd=el('g',{transform:'matrix(.72 -.25 0 1 1294.5 566)'},architecture);wall(95,215,rightEnd);path('M-7 0L47 -122L102 0Z','url(#wall)',rightEnd);path('M-10 3L47 -128L106 3','none',rightEnd,{stroke:'#c4a875','stroke-width':7});win(36,-57,22,75,rightEnd,false);win(15,123,65,90,rightEnd);
+const planting=document.getElementById('planting'),rear=document.getElementById('rear-trees');
+[[88,612,1.1],[136,566,1.05],[190,489,.85],[1214,501,1.1],[1306,576,1.05],[1350,645,.8],[362,409,.65],[1044,378,.65]].forEach(a=>use('tree',...a,rear));
+[[182,796,1.1],[225,777,.9],[266,758,.8],[1118,742,.9],[1170,768,1.1],[1230,793,1.2],[473,646,.8],[516,635,1],[857,637,.9],[903,650,.8],[81,777,.8]].forEach(a=>use('shrub',...a,planting));
+[[484,656,.58],[526,648,.52],[876,650,.58],[1173,795,.55],[212,799,.45]].forEach(a=>{const g=el('g',{class:'grass-sway'},planting);use('pampas',...a,g);});
+const stars=document.getElementById('stars');for(let i=0;i<30;i++)el('circle',{cx:180+random()*1070,cy:200+random()*210,r:.7+random()*1.2,fill:'#e6dfbb',opacity:.35+random()*.5},stars);
+let mode='day',eventMode='none',lightTimers=[],petalTimer,teaTimer,seedTimer;
+const lightButton=document.getElementById('light-all');
+function setMode(next){mode=next;document.body.classList.remove('day','dusk','night');document.body.classList.add(next);document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===next)));document.querySelector('meta[name=theme-color]').content={day:'#f3f1e8',dusk:'#eee4d5',night:'#182b35'}[next];}
+function updateLights(){const count=windows.filter(w=>w.classList.contains('lit')).length;document.body.classList.toggle('all-lit',count===windows.length);lightButton.setAttribute('aria-pressed',String(count===windows.length));renderNightLights();}
+function renderNightLights(){const layer=document.getElementById('night-lights');layer.replaceChildren();windows.forEach(w=>{if(!w.classList.contains('lit'))return;const m=w.getCTM(),sm=scene.getCTM();if(!m||!sm)return;const clone=w.cloneNode(true);clone.setAttribute('class','glowing-window');clone.setAttribute('aria-hidden','true');clone.removeAttribute('role');clone.removeAttribute('tabindex');const tr=sm.inverse().multiply(m);clone.setAttribute('transform',`matrix(${tr.a} ${tr.b} ${tr.c} ${tr.d} ${tr.e} ${tr.f})`);layer.appendChild(clone);});}
+function cancelSequence(){lightTimers.forEach(clearTimeout);lightTimers=[];lightButton.disabled=false;}
+function toggleWindow(w){cancelSequence();const on=!w.classList.contains('lit');w.classList.toggle('lit',on);w.setAttribute('aria-pressed',String(on));w.setAttribute('aria-label',on?'熄灭这扇窗户':'点亮这扇窗户');updateLights();}
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+lightButton.addEventListener('click',()=>{cancelSequence();setMode('night');const pending=windows.filter(w=>!w.classList.contains('lit'));if(!pending.length){windows.forEach(w=>{w.classList.remove('lit');w.setAttribute('aria-pressed','false');w.setAttribute('aria-label','点亮这扇窗户');});updateLights();return;}lightButton.disabled=true;pending.forEach((w,i)=>lightTimers.push(setTimeout(()=>{w.classList.add('lit');w.setAttribute('aria-pressed','true');w.setAttribute('aria-label','熄灭这扇窗户');updateLights();if(i===pending.length-1){lightButton.disabled=false;lightTimers=[];}},reduced?0:150+i*55)));});
+function interact(g,label,fn){g.setAttribute('role','button');g.setAttribute('tabindex','0');g.setAttribute('aria-label',label);g.classList.add('interactive-prop');g.addEventListener('click',fn);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fn();}});}
+function piece(parent,delay=0){return el('g',{class:'build-piece',style:`--delay:${delay}s`},parent);}
+function blossoms(g,x,y,s=1){const cluster=el('g',{transform:`translate(${x} ${y}) scale(${s})`},g);[[0,0,1],[-12,-8,.8],[10,-14,.7],[-4,-20,.65],[16,4,.7]].forEach(([a,b,k])=>{const f=el('g',{transform:`translate(${a} ${b}) scale(${k})`},cluster);el('circle',{cx:0,cy:0,r:7,fill:'#efe7cb'},f);el('circle',{cx:-4,cy:-3,r:5,fill:'#faf5df'},f);el('circle',{cx:4,cy:-4,r:5,fill:'#f8f0d3'},f);el('circle',{cx:0,cy:4,r:5,fill:'#e5d5a8'},f);el('circle',{r:2,fill:'#b79b5b'},f);});path('M-28 6Q-36-21-12-32M12 14Q38-2 31-27','none',cluster,{stroke:'#7a8d5c','stroke-width':3});[[-27,-13,-35],[-21,-25,-28],[29,-12,35],[21,4,55]].forEach(([a,b,r])=>el('ellipse',{cx:a,cy:b,rx:5,ry:12,fill:'#8c9b67',transform:`rotate(${r} ${a} ${b})`},cluster));}
+function chair(parent,x,y,scale=1,delay=0){const c=piece(parent,delay);const g=el('g',{transform:`translate(${x} ${y}) scale(${scale})`},c);el('ellipse',{cx:2,cy:19,rx:13,ry:4,fill:'#607047',opacity:.15},g);path('M-11 0L-13 20M10 0L13 20M-10-14L-9 9M10-14L9 9','none',g,{stroke:'#e6dfc8','stroke-width':3,'stroke-linecap':'round'});rect(-12,-16,24,17,'#f9f5e7',g,{rx:3,stroke:'#c7c8ab','stroke-width':1});path('M-8-11L8-2M8-11L-8-2','none',g,{stroke:'#d3d2bc','stroke-width':1});path('M-13 1L9-2 15 6-8 10Z','#f9f5e7',g,{stroke:'#d3d2bc','stroke-width':1});}
+const wedding=document.getElementById('wedding-scene');
+// The ceremony stays within the lawn and leaves the manor sign visible.
+const platform=piece(wedding,.1);el('ellipse',{cx:700,cy:749,rx:122,ry:32,fill:'#7b8d61',opacity:.18},platform);path('M611 720L790 720 825 750 577 750Z','#e8e0c6',platform);path('M577 750H825V758H577Z','#c9c3a6',platform);
+const archRoot=piece(wedding,.15),arch=el('g',{},archRoot);path('M620 726V632Q700 525 780 632V726','none',arch,{stroke:'#c9bf98','stroke-width':8});path('M628 726V634Q700 541 772 634V726','none',arch,{stroke:'#f7f1d9','stroke-width':5});path('M630 641Q674 680 700 586Q725 679 771 640L773 686Q724 704 700 617Q675 703 628 686Z','#f4efdc',arch,{opacity:.8});blossoms(arch,635,620,1.2);blossoms(arch,649,599,1);blossoms(arch,668,583,.8);blossoms(arch,766,650,.9);blossoms(arch,776,674,.65);blossoms(arch,622,716,.9);blossoms(arch,781,716,.9);
+function petals(){const layer=document.getElementById('petals');layer.replaceChildren();clearTimeout(petalTimer);if(reduced)return;for(let i=0;i<34;i++)el('ellipse',{cx:590+random()*200,cy:570+random()*70,rx:3+random()*2,ry:2,class:'petal',style:`animation-delay:${random()*1.1}s;fill:${['#f4dfc8','#f5eacb','#f1d3c5'][i%3]}`},layer);petalTimer=setTimeout(()=>layer.replaceChildren(),4400);}
+rect(600,552,200,188,'transparent',arch);interact(arch,'婚礼花拱门',petals);
+for(let row=0;row<4;row++)for(let side=0;side<2;side++)for(let col=0;col<3;col++){const depth=row*43,x=side?782+depth*.21+col*34:618-depth*.21-col*34;chair(wedding,x,793+depth,1+row*.05,1.0+row*.23+col*.06);}
+const aisle=piece(wedding,1.85);path('M681 757H719L729 1053 671 1053Z','#f6f1de',aisle,{opacity:.82});for(let i=0;i<4;i++){blossoms(wedding,650-i*7,795+i*48,.36+i*.04);blossoms(wedding,750+i*7,795+i*48,.36+i*.04);}
+const tea=document.getElementById('tea-scene');
+const rug=piece(tea,.05);path('M300 872L523 816 665 919 422 994Z','#a58b6c',rug,{opacity:.16});path('M305 856L517 802 654 902 424 974Z','#d8c6a1',rug);path('M320 860L514 815 636 899 426 960Z','none',rug,{stroke:'#f0e3c3','stroke-width':3});
+function wicker(x,y,scale,flip=1,delay=.1){const c=piece(tea,delay),g=el('g',{transform:`translate(${x} ${y}) scale(${scale*flip} ${scale})`},c);el('ellipse',{cx:0,cy:32,rx:30,ry:8,fill:'#66734e',opacity:.15},g);path('M-24-14Q-44-56-25-64Q0-78 25-64Q44-56 24-14L19 15H-19Z','#bc9e73',g,{stroke:'#9b815e','stroke-width':2});for(let i=-20;i<=20;i+=8)path(`M${i} -59Q${i*.7} -35 ${i*.7} -10`,'none',g,{stroke:'#dfc89e','stroke-width':2});path('M-29-48Q0-62 29-48M-28-33Q0-46 28-33M-24-18Q0-32 24-18','none',g,{stroke:'#d8bd91','stroke-width':2});el('ellipse',{cy:0,rx:27,ry:14,fill:'#e8ddc2',stroke:'#c5b28e','stroke-width':2},g);path('M-19 8L-22 35M19 8L22 35','none',g,{stroke:'#947b56','stroke-width':4});}
+wicker(352,832,.9,1,.1);wicker(550,796,.83,-1,.15);wicker(617,897,.95,-1,.2);wicker(418,950,1.05,1,.25);
+const tableRoot=piece(tea,.65),table=el('g',{transform:'translate(485 875)'},tableRoot);el('ellipse',{cx:0,cy:27,rx:74,ry:23,fill:'#52663d',opacity:.18},table);path('M-48 0L-45 38M48 0L45 38','none',table,{stroke:'#917753','stroke-width':7});path('M-78-14V1Q0 40 78 1V-14Z','#a18a62',table);el('ellipse',{cy:-14,rx:78,ry:30,fill:'#d3b991',stroke:'#ad936b','stroke-width':2},table);path('M-70-20Q0-8 70-20M-66-8Q0 3 66-8','none',table,{stroke:'#c4a87d','stroke-width':1,opacity:.6});
+const kettle=el('g',{transform:'translate(0 -17)'},table);el('ellipse',{cx:0,cy:0,rx:30,ry:13,fill:'#6b6557'},kettle);path('M-29-1V14Q0 27 29 14V-1Z','#82705a',kettle);el('ellipse',{cy:12,rx:21,ry:8,fill:'#483d30'},kettle);const fire=el('g',{class:'flame'},kettle);path('M-15 12Q-18 2-8-4Q-9 4-3 5Q7-12 9-9Q6 0 14 5Q23 20 4 20Q-8 23-15 12Z','#da8545',fire);path('M-6 15Q-10 5-3 3Q-1 12 5 6Q12 19 2 20Z','#f3c16e',fire);el('circle',{cx:13,cy:7,r:1.8,class:'ember'},kettle);
+const pot=el('g',{class:'kettle-body',transform:'translate(0 -30)'},kettle);path('M-17 0Q-24-31 0-33Q24-31 17 0Z','none',pot,{stroke:'#635f4d','stroke-width':5});path('M-18-7Q-23 9-13 17Q0 24 14 17Q23 8 17-7Z','#82836a',pot,{stroke:'#656954','stroke-width':2});path('M15 1Q27 5 30-8L35-9Q34 11 17 13Z','#82836a',pot);el('ellipse',{cy:-7,rx:18,ry:5,fill:'#a2a08a'},pot);path('M-8-10Q0-19 8-10Z','#777965',pot);el('circle',{cy:-15,r:3,fill:'#a6a48b'},pot);
+const steam=el('g',{transform:'translate(0 -51)'},kettle);path('M-8 0Q-21-10-10-20Q1-28-9-37','none',steam,{class:'steam'});path('M4 0Q15-12 5-23Q-5-31 4-43','none',steam,{class:'steam s2'});path('M13 0Q24-10 14-25','none',steam,{class:'steam s3'});
+[-47,43].forEach((x,i)=>{el('ellipse',{cx:x,cy:i?0:-20,rx:11,ry:5,fill:'#f5e9cd'},table);path(`M${x-8} ${i?0:-20}v6q8 9 16 0v-6`,'#e4d7b7',table);el('ellipse',{cx:x,cy:i?0:-20,rx:6,ry:3,fill:'#8e6e45'},table);});
+el('ellipse',{cx:39,cy:-31,rx:20,ry:8,fill:'#a98b62'},table);for(let i=0;i<5;i++)el('ellipse',{cx:25+i*6,cy:-31+(i%2)*3,rx:5,ry:3,fill:i%2?'#d1b17c':'#c38d59'},table);el('ellipse',{cx:-37,cy:4,rx:13,ry:6,fill:'#c99153'},table);path('M-44 1Q-37-7-30 1','none',table,{stroke:'#78a15f','stroke-width':2});
+function boil(){tea.classList.remove('tea-boiling');void tea.getBoundingClientRect();tea.classList.add('tea-boiling');clearTimeout(teaTimer);teaTimer=setTimeout(()=>tea.classList.remove('tea-boiling'),4500);}
+rect(-40,-82,90,115,'transparent',kettle);interact(kettle,'围炉上的茶壶',boil);
+const garland=piece(tea,.05);path('M277 820V643M658 820V652','none',garland,{stroke:'#b49a70','stroke-width':5});path('M277 651Q460 729 658 659','none',garland,{stroke:'#a49876','stroke-width':1.5});for(let i=0;i<11;i++){const x=290+i*35,t=(x-277)/381,y=651+8*t+140*t*(1-t);el('circle',{cx:x,cy:y+5,r:4,class:'string-bulb'},garland);}
+const glow=el('ellipse',{cx:485,cy:882,rx:93,ry:45,fill:'url(#signlight)',class:'tea-glow'},document.getElementById('tea-night'));
+function clearEffects(){clearTimeout(petalTimer);clearTimeout(teaTimer);document.getElementById('petals').replaceChildren();tea.classList.remove('tea-boiling');}
+function setEvent(next){clearEffects();eventMode=next;document.body.classList.toggle('tea',next==='tea');wedding.classList.toggle('active',next==='wedding');tea.classList.toggle('active',next==='tea');document.getElementById('tea-night').style.display=next==='tea'?'':'none';document.querySelectorAll('[data-event]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.event===next)));}
+document.querySelectorAll('[data-event]').forEach(b=>b.addEventListener('click',()=>setEvent(eventMode===b.dataset.event?'none':b.dataset.event)));
+function pampas(){const patch=document.getElementById('pampas-patch');patch.classList.remove('shaking');void patch.getBoundingClientRect();patch.classList.add('shaking');const layer=document.getElementById('floating-seeds');layer.replaceChildren();clearTimeout(seedTimer);if(!reduced)for(let i=0;i<7;i++)el('ellipse',{cx:965+random()*80,cy:660+random()*35,rx:2,ry:5,class:'floating-seed',style:`animation-delay:${i*.12}s`},layer);seedTimer=setTimeout(()=>{layer.replaceChildren();patch.classList.remove('shaking');},6200);}
+interact(document.getElementById('pampas-patch'),'蒲苇',pampas);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelSequence();clearEffects();}});
+setEvent('none');
 
-/* 星星 */
-const starsBox = document.getElementById('stars');
-for (let i=0;i<70;i++){
-  const s = document.createElement('div');
-  s.className='star';
-  s.style.left = Math.random()*100+'vw';
-  s.style.top = Math.random()*45+'vh';
-  s.style.animationDelay = Math.random()*3+'s';
-  starsBox.appendChild(s);
-}
+// Background foliage is an illustrated atmosphere, not extra venue buildings.
+const distant=document.getElementById('distant-land');
+for(let i=0;i<18;i++){const x=20+i*80,y=580+Math.sin(i*1.7)*28,h=60+(i%4)*11;const tree=el('g',{opacity:.42},distant);el('path',{d:`M${x} ${y+20}V${y+70}`,stroke:'#a1b397','stroke-width':5},tree);el('ellipse',{cx:x,cy:y-h*.5,rx:38,ry:h,fill:'#b2c3a6'},tree);el('ellipse',{cx:x-22,cy:y-h*.28,rx:27,ry:h*.7,fill:'#becbb0'},tree);el('ellipse',{cx:x+22,cy:y-h*.32,rx:25,ry:h*.65,fill:'#acbea1'},tree);}
+const demoButton=document.getElementById('demo');let demoTimers=[],demoRunning=false;
+function stopDemo(){demoTimers.forEach(clearTimeout);demoTimers=[];demoRunning=false;document.body.classList.remove('demo-running');demoButton.setAttribute('aria-pressed','false');demoButton.setAttribute('aria-label','自动演示');}
+function resetManor(){cancelSequence();clearEffects();clearTimeout(seedTimer);windows.forEach(w=>{w.classList.remove('lit');w.setAttribute('aria-pressed','false');w.setAttribute('aria-label','点亮这扇窗户');});document.getElementById('floating-seeds').replaceChildren();document.getElementById('pampas-patch').classList.remove('shaking');setMode('day');setEvent('none');updateLights();}
+function startDemo(){stopDemo();resetManor();demoRunning=true;document.body.classList.add('demo-running');demoButton.setAttribute('aria-pressed','true');demoButton.setAttribute('aria-label','暂停演示');const cue=(ms,fn)=>demoTimers.push(setTimeout(fn,ms));cue(1800,()=>setEvent('wedding'));cue(5600,petals);cue(9500,()=>setMode('dusk'));cue(13200,()=>setEvent('tea'));cue(15700,boil);cue(19500,()=>{setMode('night');lightButton.click();});cue(24500,stopDemo);}
+demoButton.addEventListener('click',()=>{if(demoRunning){stopDemo();cancelSequence();clearEffects();}else startDemo();});
+// A direct choice always takes control back from the film sequence.
+document.querySelector('.toolbar').addEventListener('click',e=>{if(e.target.closest('#demo'))return;if(e.isTrusted&&e.target.closest('button'))stopDemo();},true);
+document.getElementById('reset').addEventListener('click',()=>{stopDemo();resetManor();});document.addEventListener('pointerdown',e=>{if(demoRunning&&e.target.closest('.interactive-prop,.window')){stopDemo();cancelSequence();clearEffects();}},true);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopDemo();});
+const finePointer=matchMedia('(hover: hover) and (pointer: fine)');let pointerFrame=0,pointerX=0,pointerY=0;
+function moveWorld(){document.documentElement.style.setProperty('--world-x',pointerX+'px');document.documentElement.style.setProperty('--world-y',pointerY+'px');pointerFrame=0;}
+document.addEventListener('pointermove',e=>{if(reduced||!finePointer.matches||e.pointerType!=='mouse')return;pointerX=(e.clientX/innerWidth-.5)*9;pointerY=(e.clientY/innerHeight-.5)*6;if(!pointerFrame)pointerFrame=requestAnimationFrame(moveWorld);},{passive:true});
+document.documentElement.addEventListener('pointerleave',()=>{pointerX=0;pointerY=0;if(!pointerFrame)pointerFrame=requestAnimationFrame(moveWorld);});
 
-/* 云朵 */
-const clouds = [[8,'12%'],[6,'30%'],[10,'55%'],[7,'75%']];
-clouds.forEach(([h,t],i)=>{
-  const c=document.createElement('div');
-  c.className='cloud';
-  c.style.top=t; c.style.left='-20vw';
-  c.style.animationDuration=(60+i*22)+'s';
-  c.style.animationDelay=(-i*15)+'s';
-  c.innerHTML=`<svg width="${h*16}" height="${h*7}" viewBox="0 0 100 45"><ellipse cx="30" cy="30" rx="30" ry="14" fill="#fff"/><ellipse cx="60" cy="24" rx="26" ry="16" fill="#fff"/><ellipse cx="82" cy="32" rx="20" ry="11" fill="#fff"/></svg>`;
-  stage.appendChild(c);
-});
-
-/* 模式切换 */
-function setMode(m){
-  document.querySelectorAll('.sky-btns button[data-mode]').forEach(x=>x.classList.toggle('on', x.dataset.mode===m));
-  ['day','dusk','night'].forEach(x=>stage.classList.remove(x));
-  stage.classList.add(m);
-}
-document.querySelectorAll('.sky-btns button[data-mode]').forEach(b=>{
-  b.onclick = e => { e.stopPropagation(); setMode(b.dataset.mode); };
-});
-
-/* 自动巡游 */
-let tourTimer=null, tourStep=0;
-const tourBtn=document.getElementById('tourBtn');
-function tourTick(){
-  const order=['day','dusk','night'];
-  const m=order[tourStep%3];
-  setMode(m);
-  setTimeout(()=>{
-    if(m==='day'){ petals(); spawnBalloon(); }
-    if(m==='dusk'){ meteor(); spawnBalloon(); }
-    if(m==='night'){ setTimeout(droneShow, 1200); }
-  }, 2500);
-  tourStep++;
-}
-tourBtn.onclick = e => {
-  e.stopPropagation();
-  if(tourTimer){ clearInterval(tourTimer); tourTimer=null; tourBtn.classList.remove('tour-on'); tourBtn.textContent='🎬 自动巡游'; }
-  else { tourBtn.classList.add('tour-on'); tourBtn.textContent='⏸ 停止巡游'; tourStep=0; tourTick(); tourTimer=setInterval(tourTick, 11000); }
-};
-
-/* 粒子 */
-let particles = [];
-let drones = [];
-function loop(){
-  ctx.clearRect(0,0,W,H);
-  particles = particles.filter(p=>{
-    p.life--; p.x+=p.vx; p.y+=p.vy; p.vy+=p.g||0;
-    if(p.type==='petal'){ p.x+=Math.sin(p.life/18)*1.2; }
-    ctx.save();
-    const a=Math.max(p.life/p.max,0);
-    if(p.type==='petal'){
-      ctx.globalAlpha=a; ctx.translate(p.x,p.y); ctx.rotate(p.life/20);
-      ctx.fillStyle=p.c; ctx.beginPath(); ctx.ellipse(0,0,6,3.4,0,0,Math.PI*2); ctx.fill();
-    } else if(p.type==='spark'){
-      ctx.globalAlpha=a; ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-    } else if(p.type==='fly'){
-      ctx.globalAlpha=a*(0.4+0.6*Math.abs(Math.sin(p.life/9)));
-      ctx.fillStyle='#ffe9a0'; ctx.shadowColor='#ffe9a0'; ctx.shadowBlur=8;
-      ctx.beginPath(); ctx.arc(p.x,p.y,2.4,0,Math.PI*2); ctx.fill();
-    } else if(p.type==='lantern'){
-      ctx.globalAlpha=a*.9; p.x+=Math.sin(p.life/30)*.5;
-      const g=ctx.createRadialGradient(p.x,p.y,1,p.x,p.y,10);
-      g.addColorStop(0,'#ffdf9e'); g.addColorStop(1,'rgba(255,180,90,0)');
-      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p.x,p.y,10,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle='#ffb25e'; ctx.beginPath(); ctx.ellipse(p.x,p.y,4,5.5,0,0,Math.PI*2); ctx.fill();
-    } else if(p.type==='flower'){
-      ctx.globalAlpha=a; ctx.translate(p.x,p.y);
-      const s=p.size;
-      ctx.fillStyle=p.c;
-      for(let k=0;k<5;k++){ ctx.beginPath(); ctx.arc(Math.cos(k*1.257)*4*s,Math.sin(k*1.257)*4*s,2.6*s,0,Math.PI*2); ctx.fill(); }
-      ctx.fillStyle='#ffe9a0'; ctx.beginPath(); ctx.arc(0,0,2*s,0,Math.PI*2); ctx.fill();
-    }
-    ctx.restore();
-    return p.life>0 && p.y<H+40;
-  });
-
-  /* 无人机 */
-  drones = drones.filter(d=>{
-    d.t++;
-    if(d.t < d.dur){
-      const k=Math.min(d.t/d.dur,1), e=1-Math.pow(1-k,3);
-      d.x=d.fx+(d.tx-d.fx)*e; d.y=d.fy+(d.ty-d.fy)*e;
-    } else if(d.t < d.dur+d.hold){
-      d.pulse=.5+.5*Math.sin(d.t/6);
-    } else { d.x+=d.vx; d.y+=d.vy-0.3; }
-    const fade=d.t>d.dur+d.hold?Math.max(1-(d.t-d.dur-d.hold)/90,0):1;
-    if(fade<=0) return false;
-    ctx.save();
-    ctx.globalAlpha=fade*(.55+.45*Math.abs(Math.sin((d.t+d.i*13)/10)));
-    ctx.fillStyle=d.c; ctx.shadowColor=d.c; ctx.shadowBlur=10;
-    ctx.beginPath(); ctx.arc(d.x,d.y,2.6+(d.pulse||0)*1.4,0,Math.PI*2); ctx.fill();
-    ctx.restore();
-    return d.y>-20;
-  });
-  requestAnimationFrame(loop);
-}
-loop();
-
-/* 特效 */
-function petals(){
-  const cols=['#f7c5cc','#f9d9c0','#f3b8c3','#fde7ef'];
-  for(let i=0;i<50;i++) setTimeout(()=>{
-    particles.push({type:'petal', x:Math.random()*W, y:-20, vx:.6, vy:1.6+Math.random(), life:200, max:200, c:cols[i%4]});
-  }, i*30);
-}
-function meteor(){
-  const x=Math.random()*W*.8, y=Math.random()*H*.3;
-  for(let i=0;i<26;i++) particles.push({type:'spark', x:x+i*7, y:y+i*3.4, vx:.4, vy:1.6, life:70-i, max:70, r:2.2-i*.05, c:'#fff3d6'});
-}
-function firework(x,y){
-  const cols=['#ffd27a','#ff9d8a','#a8d8ff','#d9b3ff','#ffe9a0'];
-  const c=cols[Math.floor(Math.random()*cols.length)];
-  for(let i=0;i<42;i++){
-    const a=Math.PI*2*i/42, sp=2.2+Math.random()*2.6;
-    particles.push({type:'spark', x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, g:.05, life:70, max:70, r:2.4, c});
-  }
-  particles.push({type:'spark', x, y, vx:0, vy:0, life:20, max:20, r:16, c:'#fff'});
-}
-function fireflies(){
-  for(let i=0;i<26;i++) setTimeout(()=>{
-    particles.push({type:'fly', x:Math.random()*W, y:H*.62+Math.random()*H*.3, vx:(Math.random()-.5)*1.4, vy:(Math.random()-.5)*.9, life:230, max:230});
-  }, i*60);
-}
-function lanterns(){
-  for(let i=0;i<14;i++) setTimeout(()=>{
-    particles.push({type:'lantern', x:Math.random()*W, y:H*.7+Math.random()*H*.2, vx:(Math.random()-.5)*.4, vy:-(.7+Math.random()*.5), life:320, max:320});
-  }, i*220);
-}
-function flowers(x,y){
-  const cols=['#f7c5cc','#f9d9c0','#d9b3ff','#f3b8c3','#fff'];
-  for(let i=0;i<16;i++){
-    const fx=x+(Math.random()-.5)*180, fy=y+Math.random()*50;
-    particles.push({type:'flower', x:fx, y:Math.min(fy,H*.96), vx:0, vy:0, life:340, max:340, size:.8+Math.random()*1.3, c:cols[i%5]});
-  }
-}
-/* 热气球 */
-function spawnBalloon(){
-  const b=document.createElement('div');
-  b.className='balloon';
-  const size=64+Math.random()*40;
-  const colors=[['#f3b8c3','#e8a0a8'],['#a8d8ff','#8fb8dd'],['#ffe9a0','#e8c96a'],['#d9c2f0','#b89dd8']];
-  const cc=colors[Math.floor(Math.random()*4)];
-  const startLeft=Math.random()<.5?-140:W+40;
-  b.style.left=startLeft+'px';
-  b.style.top=(H*.10+Math.random()*H*.22)+'px';
-  b.innerHTML=`<svg width="${size*.6}" height="${size}" viewBox="0 0 60 100">
-    <ellipse cx="30" cy="34" rx="26" ry="32" fill="${cc[0]}"/>
-    <path d="M30 2 Q14 34 30 66 Q46 34 30 2" fill="${cc[1]}" opacity=".55"/>
-    <rect x="22" y="76" width="16" height="12" rx="3" fill="#9a7b58"/>
-    <path d="M8 60 L22 76 M52 60 L38 76" stroke="#9a7b58" stroke-width="1.6"/>
-  </svg>`;
-  stage.appendChild(b);
-  const dur=14000+Math.random()*8000;
-  const to=startLeft<0?W+160:-180;
-  b.animate([{left:startLeft+'px'},{left:to+'px'}],{duration:dur,easing:'linear'}).onfinish=()=>b.remove();
-}
-/* 无人机灯光秀：心形 */
-function droneShow(){
-  const n=88, cx=W/2, cy=H*.30, s=Math.min(W,H)/40;
-  for(let i=0;i<n;i++){
-    const t=i/n*Math.PI*2;
-    const tx=cx+16*Math.pow(Math.sin(t),3)*s;
-    const ty=cy-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*s;
-    const fx=Math.random()*W, fy=H+10;
-    drones.push({i, x:fx, y:fy, fx, fy, tx, ty, t:0, dur:90+Math.random()*40, hold:260,
-      vx:(Math.random()-.5)*1.6, vy:-(Math.random()*1.2+.6),
-      c:['#ffd884','#ff9d8a','#a8d8ff','#ffe9b0'][i%4], pulse:0});
-  }
-  setTimeout(()=>firework(W*.28,H*.2),2600);
-  setTimeout(()=>firework(W*.72,H*.18),3800);
-  setTimeout(()=>firework(W*.5,H*.14),5000);
-}
-
-function mode(){ return stage.classList.contains('night')?'night':stage.classList.contains('dusk')?'dusk':'day'; }
-
-/* 交互 */
-document.addEventListener('click', e=>{
-  if(e.target.closest('button')||e.target.closest('svg')||e.target.closest('.balloon')) return;
-  const m=mode(), x=e.clientX, y=e.clientY;
-  if(m==='day'){ petals(); if(Math.random()<.6) spawnBalloon(); }
-  else if(m==='dusk'){ meteor(); spawnBalloon(); }
-  else { firework(x, Math.max(y,H*.2)); if(Math.random()<.5) setTimeout(()=>lanterns(),600); }
-});
-function castleTap(){
-  document.querySelectorAll('.win').forEach((w,i)=>setTimeout(()=>{ w.style.filter='drop-shadow(0 0 10px rgba(255,200,100,1))'; w.style.fill='#ffe6a8'; }, i*90));
-  setTimeout(()=>{ document.querySelectorAll('.win').forEach(w=>{w.style.filter='';w.style.fill='';}); }, 5000);
-  if(mode()==='night'){ droneShow(); }
-  else { petals(); spawnBalloon(); }
-}
-function fxTap(t){
-  if(mode()==='night'){ fireflies(); }
-  else if(t==='pampas'){ petals(); }
-  else { flowers(event?event.clientX:W/2, event?event.clientY:H*.8); }
-}
-document.addEventListener('dblclick', e=>{
-  if(e.target.closest('button')||e.target.closest('svg')) return;
-  if(mode()==='night'){ for(let i=0;i<3;i++) setTimeout(()=>firework(Math.random()*W, H*(.15+Math.random()*.2)), i*500); }
-  else flowers(e.clientX, e.clientY);
-});
-
-/* 开场：徽章揭幕 → 自动演示 */
-const splash=document.getElementById('splash');
-setTimeout(()=>{ splash.style.opacity=0; setTimeout(()=>splash.remove(),1500); }, 3000);
-setTimeout(()=>{ petals(); spawnBalloon(); }, 3800);
 </script>
 </body>
 </html>
