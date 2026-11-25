@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>云游田畔庄园 · 小园丁种出来的城堡</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+  html { -webkit-text-size-adjust:100%; text-size-adjust:100%; overflow:hidden; }
+  body {
+    width:100vw; height:100vh; height:100dvh; overflow:hidden;
+    font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+    cursor:pointer;
+  }
+  .stage { position:fixed; inset:0; overflow:hidden; transition:background 2s ease; }
+  .stage.day   { background:linear-gradient(#cfe8f5 0%,#e8f4ec 55%,#f6f0dc 100%); }
+  .stage.dusk  { background:linear-gradient(#8fa8c9 0%,#e8b98a 55%,#f2d9a7 100%); }
+  .stage.night { background:linear-gradient(#1d2a4a 0%,#33406b 55%,#4a4a6e 100%); }
+
+  .sky-btns { position:fixed; top:18px; top:calc(18px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:50; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; width:max-content; max-width:96vw; }
+  .sky-btns button {
+    border:none; border-radius:999px; padding:8px 18px; font-size:14px; white-space:nowrap; flex:0 0 auto; line-height:1.25;
+    background:rgba(255,255,255,.75); color:#5a6b7a; cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.12); transition:all .3s; backdrop-filter:blur(4px);
+  }
+  .sky-btns button.on { background:#fff; color:#c96f4a; font-weight:600; transform:scale(1.08); }
+  .stage.night .sky-btns button { background:rgba(30,40,70,.7); color:#d8def0; }
+  .stage.night .sky-btns button.on { background:#f2d9a7; color:#4a3b28; }
+  .sky-btns button.tour-on { background:#c96f4a; color:#fff; }
+
+  .scene { position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center; }
+  svg.castle-svg { width:min(92vw,900px); height:auto; display:block; }
+
+  .win { fill:#fff7e0; transition:fill 1.2s, filter 1.2s; }
+  .night .win { fill:#ffd884; filter:drop-shadow(0 0 6px rgba(255,200,100,.9)); }
+  .dusk  .win { fill:#ffe9b8; filter:drop-shadow(0 0 4px rgba(255,190,110,.6)); }
+  .glow { transition:opacity 1.2s; opacity:0; }
+  .night .glow { opacity:1; }
+
+  .sun, .moon { position:absolute; border-radius:50%; transition:all 2s ease; }
+  .sun { width:74px;height:74px; top:10%; right:14%; background:radial-gradient(#fff3c9,#ffd98a 60%,rgba(255,217,138,0)); }
+  .dusk .sun { top:26%; right:22%; width:64px;height:64px; background:radial-gradient(#ffe3ae,#ff9d6b 60%,rgba(255,157,107,0)); }
+  .night .sun { opacity:0; top:4%; }
+  .moon { width:56px;height:56px; top:9%; right:15%; background:radial-gradient(#fffbe8,#f4ead0 65%,rgba(244,234,208,.0)); opacity:0; }
+  .night .moon { opacity:1; }
+
+  .stars { position:absolute; inset:0; opacity:0; transition:opacity 2s; }
+  .night .stars { opacity:1; }
+  .star { position:absolute; width:3px;height:3px; background:#fff; border-radius:50%; animation:twinkle 3s infinite; }
+  @keyframes twinkle { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+  .cloud { position:absolute; opacity:.85; animation:drift linear infinite; }
+  .night .cloud { opacity:.25; }
+  @keyframes drift { from{transform:translateX(-20vw)} to{transform:translateX(110vw)} }
+
+  .pampas { transform-origin:bottom center; animation:sway 4s ease-in-out infinite; }
+  @keyframes sway { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
+
+  #fx { position:fixed; inset:0; pointer-events:none; z-index:40; }
+
+  .title-card {
+    position:fixed; top:58px; left:50%; transform:translateX(-50%);
+    text-align:center; z-index:45; pointer-events:none; transition:color 2s;
+  }
+  .title-card .crest { width:52px; height:52px; margin:0 auto 6px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.18)); }
+  .title-card h1 { font-size:20px; letter-spacing:6px; font-weight:500; color:#6b7d8c; }
+  .title-card p { font-size:12px; letter-spacing:3px; color:#9aa8b3; margin-top:6px; }
+  .night .title-card h1 { color:#e8d9b8; }
+  .night .title-card p { color:#8f9ab5; }
+  .dusk .title-card h1 { color:#8a6a4f; }
+
+  /* 开场 logo 揭幕 */
+  .splash {
+    position:fixed; inset:0; z-index:90; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px;
+    background:rgba(28,36,56,.92); transition:opacity 1.4s ease;
+  }
+  .splash .crest-big { width:120px; height:120px; animation:pop 1.2s cubic-bezier(.2,1.6,.4,1); }
+  .splash h1 { color:#f2e4c2; font-size:26px; letter-spacing:10px; font-weight:500; animation:fadeUp 1.4s; }
+  .splash p { color:#a8b2c9; font-size:13px; letter-spacing:4px; animation:fadeUp 1.6s; }
+  .splash p.tap-hint { color:#d3daea; font-size:12.5px; letter-spacing:2.5px; margin-top:-4px; animation:fadeUp 1.6s .5s both; }
+  @keyframes pop { 0%{transform:scale(.2);opacity:0} 70%{transform:scale(1.12)} 100%{transform:scale(1);opacity:1} }
+  @keyframes fadeUp { 0%{transform:translateY(14px);opacity:0} 100%{transform:translateY(0);opacity:1} }
+
+  /* 热气球 */
+  .balloon { position:fixed; z-index:30; pointer-events:none; }
+  .balloon svg { animation:bob 3s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+  /* 手机竖屏适配 */
+  @media (max-width: 640px) {
+    .sky-btns { top:10px; top:calc(10px + env(safe-area-inset-top)); gap:6px; }
+    .sky-btns button { padding:6px 11px; font-size:12.5px; }
+    .title-card { top:100px; }
+    .title-card .crest { width:40px; height:40px; }
+    .title-card h1 { font-size:17px; letter-spacing:4px; }
+    .title-card p { font-size:10.5px; letter-spacing:2px; }
+    .scene { display:block; }
+    svg.castle-svg {
+      position:absolute; bottom:1.5vh; left:50%; transform:translateX(-50%);
+      width:168vw; max-width:none;
+    }
+    .sun { width:52px; height:52px; top:21%; right:7%; }
+    .dusk .sun { width:46px; height:46px; top:32%; right:12%; }
+    .moon { width:42px; height:42px; top:20%; right:8%; }
+    .splash .crest-big { width:92px; height:92px; }
+    .splash h1 { font-size:20px; letter-spacing:6px; }
+    .splash p { font-size:11px; letter-spacing:3px; }
+    .splash p.tap-hint { font-size:11px; letter-spacing:2px; }
+  }
+
+  /* 徽章配色 */
+  .c-shield { fill:#f4ead0; stroke:#b98d5f; stroke-width:6; }
+  .c-castle { fill:#c96f4a; }
+  .c-field  { fill:#a8c98a; }
+  .c-wheat  { fill:#d8b45f; }
+  .c-text   { fill:#8a5a3a; font-family:serif; }
+</style>
+</head>
+<body>
+<div class="stage day" id="stage">
+  <div class="sun"></div>
+  <div class="moon"></div>
+  <div class="stars" id="stars"></div>
+
+  <!-- 田畔庄园 徽章模板 -->
+  <svg style="position:absolute;width:0;height:0">
+    <defs>
+      <g id="crestShape">
+        <path class="c-shield" d="M50 4 C70 12 88 14 94 14 C94 58 84 84 50 96 C16 84 6 58 6 14 C12 14 30 12 50 4 Z"/>
+        <path class="c-field" d="M14 62 Q32 54 50 60 Q68 66 86 60 L84 72 Q68 80 50 74 Q32 68 17 74 Z"/>
+        <g class="c-castle">
+          <rect x="30" y="40" width="12" height="20"/>
+          <rect x="58" y="40" width="12" height="20"/>
+          <rect x="41" y="30" width="18" height="30"/>
+          <polygon points="38,30 50,20 62,30"/>
+          <rect x="34" y="26" width="3" height="10"/>
+          <rect x="63" y="26" width="3" height="10"/>
+        </g>
+        <g class="c-wheat">
+          <path d="M24 70 Q22 58 24 50" stroke="#d8b45f" stroke-width="2" fill="none"/>
+          <path d="M76 70 Q78 58 76 50" stroke="#d8b45f" stroke-width="2" fill="none"/>
+        </g>
+        <text class="c-text" x="50" y="90" text-anchor="middle" font-size="10" letter-spacing="1">田畔庄园</text>
+      </g>
+    </defs>
+  </svg>
+
+  <div class="title-card">
+    <svg class="crest" viewBox="0 0 100 100"><use href="#crestShape"/></svg>
+    <h1>云游田畔庄园</h1>
+    <p>小园丁种出来的城堡 · 成都新津</p>
+  </div>
+
+  <div class="sky-btns">
+    <button data-mode="day" class="on">☀️ 白天</button>
+    <button data-mode="dusk">🌇 黄昏</button>
+    <button data-mode="night">🌙 夜晚</button>
+    <button id="tourBtn">🎬 自动巡游</button>
+  </div>
+
+  <div class="scene">
+    <svg class="castle-svg" viewBox="0 0 900 560">
+      <!-- 草坪 -->
+      <ellipse cx="450" cy="548" rx="460" ry="46" fill="#a8c98a"/>
+      <ellipse cx="450" cy="560" rx="480" ry="40" fill="#96bd7c"/>
+      <path d="M380 560 Q450 520 520 560 Z" fill="#e9dfc4"/>
+
+      <!-- 主楼 -->
+      <g id="castle" onclick="castleTap()" style="cursor:pointer">
+        <rect x="150" y="330" width="180" height="190" fill="#e4c39a"/>
+        <rect x="150" y="330" width="180" height="190" fill="none" stroke="#c9a271" stroke-width="3"/>
+        <polygon points="150,330 240,272 330,330" fill="#9aa7b5"/>
+        <rect x="186" y="370" width="24" height="38" rx="12" class="win"/>
+        <rect x="238" y="370" width="24" height="38" rx="12" class="win"/>
+        <rect x="290" y="370" width="24" height="38" rx="12" class="win"/>
+        <rect x="186" y="440" width="24" height="38" rx="12" class="win"/>
+        <rect x="290" y="440" width="24" height="38" rx="12" class="win"/>
+        <rect x="222" y="452" width="40" height="68" rx="20" fill="#8a6a4f"/>
+        <rect x="172" y="292" width="16" height="42" fill="#b98d5f"/>
+        <!-- 中央主塔（尖山墙） -->
+        <rect x="330" y="240" width="240" height="280" fill="#e9c9a0"/>
+        <rect x="330" y="240" width="240" height="280" fill="none" stroke="#c9a271" stroke-width="3"/>
+        <polygon points="330,240 450,150 570,240" fill="#8f9cad"/>
+        <polygon points="330,240 450,150 570,240" fill="none" stroke="#7a8ba0" stroke-width="3"/>
+        <rect x="436" y="196" width="28" height="58" rx="14" class="win"/>
+        <rect x="366" y="300" width="26" height="44" rx="13" class="win"/>
+        <rect x="437" y="300" width="26" height="44" rx="13" class="win"/>
+        <rect x="508" y="300" width="26" height="44" rx="13" class="win"/>
+        <rect x="366" y="386" width="26" height="44" rx="13" class="win"/>
+        <rect x="508" y="386" width="26" height="44" rx="13" class="win"/>
+        <rect x="424" y="430" width="52" height="90" rx="26" fill="#8a6a4f"/>
+        <g transform="translate(382,268)">
+          <rect x="0" y="10" width="26" height="26" fill="#f0dcc0"/>
+          <polygon points="0,10 13,0 26,10" fill="#9aa7b5"/>
+        </g>
+        <g transform="translate(492,268)">
+          <rect x="0" y="10" width="26" height="26" fill="#f0dcc0"/>
+          <polygon points="0,10 13,0 26,10" fill="#9aa7b5"/>
+        </g>
+        <rect x="352" y="188" width="16" height="52" fill="#b98d5f"/>
+        <rect x="532" y="188" width="16" height="52" fill="#b98d5f"/>
+        <!-- 右翼 -->
+        <rect x="570" y="330" width="180" height="190" fill="#e4c39a"/>
+        <rect x="570" y="330" width="180" height="190" fill="none" stroke="#c9a271" stroke-width="3"/>
+        <polygon points="570,330 660,272 750,330" fill="#9aa7b5"/>
+        <rect x="596" y="370" width="24" height="38" rx="12" class="win"/>
+        <rect x="648" y="370" width="24" height="38" rx="12" class="win"/>
+        <rect x="700" y="370" width="24" height="38" rx="12" class="win"/>
+        <rect x="596" y="440" width="24" height="38" rx="12" class="win"/>
+        <rect x="700" y="440" width="24" height="38" rx="12" class="win"/>
+        <rect x="638" y="452" width="40" height="68" rx="20" fill="#8a6a4f"/>
+        <rect x="712" y="292" width="16" height="42" fill="#b98d5f"/>
+        <g class="glow">
+          <circle cx="240" cy="330" r="4" fill="#ffd884"/><circle cx="280" cy="318" r="4" fill="#ffd884"/>
+          <circle cx="320" cy="330" r="4" fill="#ffd884"/><circle cx="580" cy="330" r="4" fill="#ffd884"/>
+          <circle cx="620" cy="318" r="4" fill="#ffd884"/><circle cx="660" cy="330" r="4" fill="#ffd884"/>
+          <circle cx="450" cy="152" r="5" fill="#ffe9b0"/>
+        </g>
+      </g>
+
+      <!-- 入口门牌（画在城堡之后，位于前景） -->
+      <g id="gate" transform="translate(450,512)">
+        <rect x="-46" y="0" width="10" height="46" rx="3" fill="#c9a271"/>
+        <rect x="36" y="0" width="10" height="46" rx="3" fill="#c9a271"/>
+        <path d="M-52 4 Q0 -26 52 4" fill="none" stroke="#b98d5f" stroke-width="6"/>
+        <rect x="-34" y="6" width="68" height="20" rx="4" fill="#f4ead0" stroke="#b98d5f" stroke-width="2.5"/>
+        <text x="0" y="20.5" text-anchor="middle" font-size="13" fill="#8a5a3a" style="font-family:serif;letter-spacing:2px">田畔庄园</text>
+        <circle cx="-34" cy="-2" r="2.5" class="win"/>
+        <circle cx="34" cy="-2" r="2.5" class="win"/>
+      </g>
+
+      <!-- 蒲苇 -->
+      <g class="pampas" onclick="fxTap('pampas')" style="cursor:pointer">
+        <g transform="translate(96,470)">
+          <path d="M0 60 Q-4 20 -10 0" stroke="#c9b98a" stroke-width="3" fill="none"/>
+          <path d="M10 60 Q14 24 20 4" stroke="#c9b98a" stroke-width="3" fill="none"/>
+          <ellipse cx="-12" cy="-4" rx="9" ry="22" fill="#e8dcc0" transform="rotate(-14)"/>
+          <ellipse cx="21" cy="0" rx="9" ry="24" fill="#e2d4b4" transform="rotate(12)"/>
+        </g>
+        <g transform="translate(806,466)">
+          <path d="M0 60 Q-4 20 -10 0" stroke="#c9b98a" stroke-width="3" fill="none"/>
+          <path d="M12 60 Q16 26 24 6" stroke="#c9b98a" stroke-width="3" fill="none"/>
+          <ellipse cx="-12" cy="-2" rx="9" ry="22" fill="#e8dcc0" transform="rotate(-12)"/>
+          <ellipse cx="26" cy="2" rx="9" ry="24" fill="#e2d4b4" transform="rotate(14)"/>
+        </g>
+        <g transform="translate(770,486)">
+          <path d="M0 52 Q-2 18 -6 2" stroke="#c9b98a" stroke-width="2.5" fill="none"/>
+          <ellipse cx="-7" cy="-2" rx="8" ry="18" fill="#e5d8ba" transform="rotate(-10)"/>
+        </g>
+      </g>
+
+      <!-- 小树 -->
+      <g onclick="fxTap('tree')" style="cursor:pointer">
+        <g transform="translate(120,486)">
+          <rect x="-4" y="18" width="8" height="26" fill="#9a7b58"/>
+          <circle cx="0" cy="0" r="26" fill="#a9cc90"/>
+          <circle cx="-14" cy="10" r="16" fill="#b7d69e"/>
+          <circle cx="14" cy="8" r="17" fill="#9fc487"/>
+        </g>
+        <g transform="translate(790,500)">
+          <rect x="-4" y="14" width="8" height="22" fill="#9a7b58"/>
+          <circle cx="0" cy="0" r="22" fill="#a9cc90"/>
+          <circle cx="12" cy="8" r="14" fill="#b7d69e"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <canvas id="fx"></canvas>
+</div>
+
+<!-- 开场徽章揭幕 -->
+<div class="splash" id="splash">
+  <svg class="crest-big" viewBox="0 0 100 100"><use href="#crestShape"/></svg>
+  <h1>田畔庄园</h1>
+  <p>TIANPAN MANOR · 成都新津</p>
+  <p class="tap-hint">这座城堡可以点一点 · 天空、城堡、草地都有惊喜</p>
+</div>
+
+<script>
+const stage = document.getElementById('stage');
+const canvas = document.getElementById('fx');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+resize(); addEventListener('resize', resize);
+
+/* 星星 */
+const starsBox = document.getElementById('stars');
+for (let i=0;i<70;i++){
+  const s = document.createElement('div');
+  s.className='star';
+  s.style.left = Math.random()*100+'vw';
+  s.style.top = Math.random()*45+'vh';
+  s.style.animationDelay = Math.random()*3+'s';
+  starsBox.appendChild(s);
+}
+
+/* 云朵 */
+const clouds = [[8,'12%'],[6,'30%'],[10,'55%'],[7,'75%']];
+clouds.forEach(([h,t],i)=>{
+  const c=document.createElement('div');
+  c.className='cloud';
+  c.style.top=t; c.style.left='-20vw';
+  c.style.animationDuration=(60+i*22)+'s';
+  c.style.animationDelay=(-i*15)+'s';
+  c.innerHTML=`<svg width="${h*16}" height="${h*7}" viewBox="0 0 100 45"><ellipse cx="30" cy="30" rx="30" ry="14" fill="#fff"/><ellipse cx="60" cy="24" rx="26" ry="16" fill="#fff"/><ellipse cx="82" cy="32" rx="20" ry="11" fill="#fff"/></svg>`;
+  stage.appendChild(c);
+});
+
+/* 模式切换 */
+function setMode(m){
+  document.querySelectorAll('.sky-btns button[data-mode]').forEach(x=>x.classList.toggle('on', x.dataset.mode===m));
+  ['day','dusk','night'].forEach(x=>stage.classList.remove(x));
+  stage.classList.add(m);
+}
+document.querySelectorAll('.sky-btns button[data-mode]').forEach(b=>{
+  b.onclick = e => { e.stopPropagation(); setMode(b.dataset.mode); };
+});
+
+/* 自动巡游 */
+let tourTimer=null, tourStep=0;
+const tourBtn=document.getElementById('tourBtn');
+function tourTick(){
+  const order=['day','dusk','night'];
+  const m=order[tourStep%3];
+  setMode(m);
+  setTimeout(()=>{
+    if(m==='day'){ petals(); spawnBalloon(); }
+    if(m==='dusk'){ meteor(); spawnBalloon(); }
+    if(m==='night'){ setTimeout(droneShow, 1200); }
+  }, 2500);
+  tourStep++;
+}
+tourBtn.onclick = e => {
+  e.stopPropagation();
+  if(tourTimer){ clearInterval(tourTimer); tourTimer=null; tourBtn.classList.remove('tour-on'); tourBtn.textContent='🎬 自动巡游'; }
+  else { tourBtn.classList.add('tour-on'); tourBtn.textContent='⏸ 停止巡游'; tourStep=0; tourTick(); tourTimer=setInterval(tourTick, 11000); }
+};
+
+/* 粒子 */
+let particles = [];
+let drones = [];
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  particles = particles.filter(p=>{
+    p.life--; p.x+=p.vx; p.y+=p.vy; p.vy+=p.g||0;
+    if(p.type==='petal'){ p.x+=Math.sin(p.life/18)*1.2; }
+    ctx.save();
+    const a=Math.max(p.life/p.max,0);
+    if(p.type==='petal'){
+      ctx.globalAlpha=a; ctx.translate(p.x,p.y); ctx.rotate(p.life/20);
+      ctx.fillStyle=p.c; ctx.beginPath(); ctx.ellipse(0,0,6,3.4,0,0,Math.PI*2); ctx.fill();
+    } else if(p.type==='spark'){
+      ctx.globalAlpha=a; ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    } else if(p.type==='fly'){
+      ctx.globalAlpha=a*(0.4+0.6*Math.abs(Math.sin(p.life/9)));
+      ctx.fillStyle='#ffe9a0'; ctx.shadowColor='#ffe9a0'; ctx.shadowBlur=8;
+      ctx.beginPath(); ctx.arc(p.x,p.y,2.4,0,Math.PI*2); ctx.fill();
+    } else if(p.type==='lantern'){
+      ctx.globalAlpha=a*.9; p.x+=Math.sin(p.life/30)*.5;
+      const g=ctx.createRadialGradient(p.x,p.y,1,p.x,p.y,10);
+      g.addColorStop(0,'#ffdf9e'); g.addColorStop(1,'rgba(255,180,90,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p.x,p.y,10,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffb25e'; ctx.beginPath(); ctx.ellipse(p.x,p.y,4,5.5,0,0,Math.PI*2); ctx.fill();
+    } else if(p.type==='flower'){
+      ctx.globalAlpha=a; ctx.translate(p.x,p.y);
+      const s=p.size;
+      ctx.fillStyle=p.c;
+      for(let k=0;k<5;k++){ ctx.beginPath(); ctx.arc(Math.cos(k*1.257)*4*s,Math.sin(k*1.257)*4*s,2.6*s,0,Math.PI*2); ctx.fill(); }
+      ctx.fillStyle='#ffe9a0'; ctx.beginPath(); ctx.arc(0,0,2*s,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+    return p.life>0 && p.y<H+40;
+  });
+
+  /* 无人机 */
+  drones = drones.filter(d=>{
+    d.t++;
+    if(d.t < d.dur){
+      const k=Math.min(d.t/d.dur,1), e=1-Math.pow(1-k,3);
+      d.x=d.fx+(d.tx-d.fx)*e; d.y=d.fy+(d.ty-d.fy)*e;
+    } else if(d.t < d.dur+d.hold){
+      d.pulse=.5+.5*Math.sin(d.t/6);
+    } else { d.x+=d.vx; d.y+=d.vy-0.3; }
+    const fade=d.t>d.dur+d.hold?Math.max(1-(d.t-d.dur-d.hold)/90,0):1;
+    if(fade<=0) return false;
+    ctx.save();
+    ctx.globalAlpha=fade*(.55+.45*Math.abs(Math.sin((d.t+d.i*13)/10)));
+    ctx.fillStyle=d.c; ctx.shadowColor=d.c; ctx.shadowBlur=10;
+    ctx.beginPath(); ctx.arc(d.x,d.y,2.6+(d.pulse||0)*1.4,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    return d.y>-20;
+  });
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* 特效 */
+function petals(){
+  const cols=['#f7c5cc','#f9d9c0','#f3b8c3','#fde7ef'];
+  for(let i=0;i<50;i++) setTimeout(()=>{
+    particles.push({type:'petal', x:Math.random()*W, y:-20, vx:.6, vy:1.6+Math.random(), life:200, max:200, c:cols[i%4]});
+  }, i*30);
+}
+function meteor(){
+  const x=Math.random()*W*.8, y=Math.random()*H*.3;
+  for(let i=0;i<26;i++) particles.push({type:'spark', x:x+i*7, y:y+i*3.4, vx:.4, vy:1.6, life:70-i, max:70, r:2.2-i*.05, c:'#fff3d6'});
+}
+function firework(x,y){
+  const cols=['#ffd27a','#ff9d8a','#a8d8ff','#d9b3ff','#ffe9a0'];
+  const c=cols[Math.floor(Math.random()*cols.length)];
+  for(let i=0;i<42;i++){
+    const a=Math.PI*2*i/42, sp=2.2+Math.random()*2.6;
+    particles.push({type:'spark', x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, g:.05, life:70, max:70, r:2.4, c});
+  }
+  particles.push({type:'spark', x, y, vx:0, vy:0, life:20, max:20, r:16, c:'#fff'});
+}
+function fireflies(){
+  for(let i=0;i<26;i++) setTimeout(()=>{
+    particles.push({type:'fly', x:Math.random()*W, y:H*.62+Math.random()*H*.3, vx:(Math.random()-.5)*1.4, vy:(Math.random()-.5)*.9, life:230, max:230});
+  }, i*60);
+}
+function lanterns(){
+  for(let i=0;i<14;i++) setTimeout(()=>{
+    particles.push({type:'lantern', x:Math.random()*W, y:H*.7+Math.random()*H*.2, vx:(Math.random()-.5)*.4, vy:-(.7+Math.random()*.5), life:320, max:320});
+  }, i*220);
+}
+function flowers(x,y){
+  const cols=['#f7c5cc','#f9d9c0','#d9b3ff','#f3b8c3','#fff'];
+  for(let i=0;i<16;i++){
+    const fx=x+(Math.random()-.5)*180, fy=y+Math.random()*50;
+    particles.push({type:'flower', x:fx, y:Math.min(fy,H*.96), vx:0, vy:0, life:340, max:340, size:.8+Math.random()*1.3, c:cols[i%5]});
+  }
+}
+/* 热气球 */
+function spawnBalloon(){
+  const b=document.createElement('div');
+  b.className='balloon';
+  const size=64+Math.random()*40;
+  const colors=[['#f3b8c3','#e8a0a8'],['#a8d8ff','#8fb8dd'],['#ffe9a0','#e8c96a'],['#d9c2f0','#b89dd8']];
+  const cc=colors[Math.floor(Math.random()*4)];
+  const startLeft=Math.random()<.5?-140:W+40;
+  b.style.left=startLeft+'px';
+  b.style.top=(H*.10+Math.random()*H*.22)+'px';
+  b.innerHTML=`<svg width="${size*.6}" height="${size}" viewBox="0 0 60 100">
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="${cc[0]}"/>
+    <path d="M30 2 Q14 34 30 66 Q46 34 30 2" fill="${cc[1]}" opacity=".55"/>
+    <rect x="22" y="76" width="16" height="12" rx="3" fill="#9a7b58"/>
+    <path d="M8 60 L22 76 M52 60 L38 76" stroke="#9a7b58" stroke-width="1.6"/>
+  </svg>`;
+  stage.appendChild(b);
+  const dur=14000+Math.random()*8000;
+  const to=startLeft<0?W+160:-180;
+  b.animate([{left:startLeft+'px'},{left:to+'px'}],{duration:dur,easing:'linear'}).onfinish=()=>b.remove();
+}
+/* 无人机灯光秀：心形 */
+function droneShow(){
+  const n=88, cx=W/2, cy=H*.30, s=Math.min(W,H)/40;
+  for(let i=0;i<n;i++){
+    const t=i/n*Math.PI*2;
+    const tx=cx+16*Math.pow(Math.sin(t),3)*s;
+    const ty=cy-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*s;
+    const fx=Math.random()*W, fy=H+10;
+    drones.push({i, x:fx, y:fy, fx, fy, tx, ty, t:0, dur:90+Math.random()*40, hold:260,
+      vx:(Math.random()-.5)*1.6, vy:-(Math.random()*1.2+.6),
+      c:['#ffd884','#ff9d8a','#a8d8ff','#ffe9b0'][i%4], pulse:0});
+  }
+  setTimeout(()=>firework(W*.28,H*.2),2600);
+  setTimeout(()=>firework(W*.72,H*.18),3800);
+  setTimeout(()=>firework(W*.5,H*.14),5000);
+}
+
+function mode(){ return stage.classList.contains('night')?'night':stage.classList.contains('dusk')?'dusk':'day'; }
+
+/* 交互 */
+document.addEventListener('click', e=>{
+  if(e.target.closest('button')||e.target.closest('svg')||e.target.closest('.balloon')) return;
+  const m=mode(), x=e.clientX, y=e.clientY;
+  if(m==='day'){ petals(); if(Math.random()<.6) spawnBalloon(); }
+  else if(m==='dusk'){ meteor(); spawnBalloon(); }
+  else { firework(x, Math.max(y,H*.2)); if(Math.random()<.5) setTimeout(()=>lanterns(),600); }
+});
+function castleTap(){
+  document.querySelectorAll('.win').forEach((w,i)=>setTimeout(()=>{ w.style.filter='drop-shadow(0 0 10px rgba(255,200,100,1))'; w.style.fill='#ffe6a8'; }, i*90));
+  setTimeout(()=>{ document.querySelectorAll('.win').forEach(w=>{w.style.filter='';w.style.fill='';}); }, 5000);
+  if(mode()==='night'){ droneShow(); }
+  else { petals(); spawnBalloon(); }
+}
+function fxTap(t){
+  if(mode()==='night'){ fireflies(); }
+  else if(t==='pampas'){ petals(); }
+  else { flowers(event?event.clientX:W/2, event?event.clientY:H*.8); }
+}
+document.addEventListener('dblclick', e=>{
+  if(e.target.closest('button')||e.target.closest('svg')) return;
+  if(mode()==='night'){ for(let i=0;i<3;i++) setTimeout(()=>firework(Math.random()*W, H*(.15+Math.random()*.2)), i*500); }
+  else flowers(e.clientX, e.clientY);
+});
+
+/* 开场：徽章揭幕 → 自动演示 */
+const splash=document.getElementById('splash');
+setTimeout(()=>{ splash.style.opacity=0; setTimeout(()=>splash.remove(),1500); }, 3000);
+setTimeout(()=>{ petals(); spawnBalloon(); }, 3800);
+</script>
+</body>
+</html>
